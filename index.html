@@ -1366,7 +1366,10 @@
         const modal = document.getElementById('videoModal');
         const player = document.getElementById('videoPlayer');
         player.pause();
-        modal.classList.remove('active');
+player.currentTime = 0;
+player.load();
+modal.classList.add('active');
+
     }
 
     document.getElementById('videoModal').addEventListener('click', e => {
