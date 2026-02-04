@@ -1341,36 +1341,41 @@
     });
 
     // Video modal
-    function openVideo(product) {
-        const modal = document.getElementById('videoModal');
-        const source = document.getElementById('videoSource');
-        const player = document.getElementById('videoPlayer');
-        const caption = document.getElementById('videoCaption');
+   function openVideo(product) {
+    const modal = document.getElementById('videoModal');
+    const source = document.getElementById('videoSource');
+    const player = document.getElementById('videoPlayer');
+    const caption = document.getElementById('videoCaption');
 
-        if (product === 'callmind') {
-            source.src = 'callmind-demo.mp4';
-            caption.textContent = 'CallMind AI — Product Demo';
-        } else if (product === 'hedis') {
-            source.src = 'hedis-demo.mp4';
-            caption.textContent = 'HEDIS AI — Product Demo';
-        } else if (product === 'medinsight') {
-            source.src = 'medinsight-demo.mp4';
-            caption.textContent = 'MedInsight 360 — Product Demo';
-        }
-
-        player.load();
-        modal.classList.add('active');
+    if (product === 'callmind') {
+        source.src = 'callmind-demo.mp4';
+        caption.textContent = 'CallMind AI — Product Demo';
+    } else if (product === 'hedis') {
+        source.src = 'hedis-demo.mp4';
+        caption.textContent = 'HEDIS AI — Product Demo';
+    } else if (product === 'medinsight') {
+        source.src = 'medinsight-demo.mp4';
+        caption.textContent = 'MedInsight 360 — Product Demo';
     }
+
+    player.pause();
+    player.currentTime = 0;
+    player.load();            // load only
+    modal.classList.add('active');
+}
 
     function closeVideo() {
-        const modal = document.getElementById('videoModal');
-        const player = document.getElementById('videoPlayer');
-        player.pause();
-player.currentTime = 0;
-player.load();
-modal.classList.add('active');
+    const modal = document.getElementById('videoModal');
+    const player = document.getElementById('videoPlayer');
 
-    }
+    player.pause();
+    player.currentTime = 0;
+    player.removeAttribute('src'); // hard reset
+    player.load();
+
+    modal.classList.remove('active');
+}
+
 
     document.getElementById('videoModal').addEventListener('click', e => {
         if (e.target === e.currentTarget) closeVideo();
