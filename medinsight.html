@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedInsight 360 — Document Intelligence Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --coal: #0a0a0a; --onyx: #141414; --graphite: #1a1a1a; --slate: #2a2a2a; --ash: #3a3a3a;
+            --smoke: #7a7a7a; --silver: #a0a0a0; --pearl: #d4d4d4; --ivory: #f0f0f0; --white: #fafafa;
+            --mint: #00e5a0; --mint-glow: rgba(0,229,160,0.15); --mint-dim: rgba(0,229,160,0.08);
+            --cyan: #00d4ff; --amber: #ffb800; --coral: #ff6b6b; --violet: #a78bfa; --rose: #f43f5e;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius: 16px; --radius-sm: 10px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-body); background: var(--coal); color: var(--pearl); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+        .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,10,0.85); backdrop-filter: blur(24px) saturate(1.4); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .nav-back { color: var(--smoke); text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+        .nav-back:hover { color: var(--white); }
+        .nav-title { font-size: 15px; font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 10px; }
+
+        .tabs-bar { position: fixed; top: 64px; left: 0; right: 0; z-index: 99; background: var(--onyx); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 48px; }
+        .tabs { display: flex; gap: 4px; overflow-x: auto; }
+        .tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--smoke); background: none; border: none; cursor: pointer; white-space: nowrap; transition: all 0.2s; position: relative; font-family: var(--font-body); }
+        .tab:hover { color: var(--pearl); }
+        .tab.active { color: var(--mint); }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--mint); }
+
+        .spacer { height: 120px; }
+        .content { max-width: 1200px; margin: 0 auto; padding: 40px 48px; }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title { font-family: var(--font-display); font-size: 42px; color: var(--white); margin-bottom: 8px; font-weight: 400; }
+        .page-title em { font-style: italic; color: var(--mint); }
+        .page-sub { font-size: 16px; color: var(--smoke); margin-bottom: 40px; max-width: 750px; }
+        .section-title { font-family: var(--font-display); font-size: 28px; color: var(--white); margin: 48px 0 16px; font-weight: 400; }
+        .section-title:first-child { margin-top: 0; }
+
+        .card { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; transition: border-color 0.25s; }
+        .card:hover { border-color: rgba(255,255,255,0.1); }
+        .card-header { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .card p, .card li { color: var(--smoke); font-size: 14px; line-height: 1.7; }
+        .card strong { color: var(--pearl); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        @media (max-width: 1024px) { .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .content { padding: 24px; } .tabs-bar, .nav { padding: 0 16px; } }
+
+        .stat-box { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 24px; text-align: center; transition: transform 0.2s, border-color 0.2s; }
+        .stat-box:hover { transform: translateY(-2px); border-color: rgba(0,229,160,0.2); }
+        .stat-val { font-family: var(--font-mono); font-size: 28px; font-weight: 600; }
+        .stat-val.green { color: var(--mint); }
+        .stat-val.blue { color: var(--cyan); }
+        .stat-val.amber { color: var(--amber); }
+        .stat-val.violet { color: var(--violet); }
+        .stat-label { font-size: 12px; color: var(--smoke); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        .highlight { padding: 24px 28px; border-radius: var(--radius-sm); margin: 24px 0; border-left: 4px solid; }
+        .highlight.green { background: var(--mint-dim); border-color: var(--mint); }
+        .highlight.blue { background: rgba(0,212,255,0.06); border-color: var(--cyan); }
+        .highlight.amber { background: rgba(255,184,0,0.06); border-color: var(--amber); }
+        .highlight.violet { background: rgba(167,139,250,0.06); border-color: var(--violet); }
+        .highlight h4 { color: var(--white); margin-bottom: 8px; font-size: 15px; }
+        .highlight p { color: var(--silver); font-size: 14px; }
+        .highlight strong { color: var(--pearl); }
+
+        .feature-card { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 28px; transition: all 0.25s; }
+        .feature-card:hover { border-color: rgba(0,229,160,0.15); transform: translateY(-2px); }
+        .feature-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px; }
+        .feature-card h3 { font-size: 16px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+        .feature-card p { font-size: 13px; color: var(--smoke); line-height: 1.6; }
+        .feature-card strong { color: var(--pearl); }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .tag { font-size: 12px; padding: 5px 14px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.08); }
+        .tag.mint { background: var(--mint-dim); color: var(--mint); border-color: rgba(0,229,160,0.2); }
+        .tag.blue { background: rgba(0,212,255,0.08); color: var(--cyan); border-color: rgba(0,212,255,0.2); }
+        .tag.violet { background: rgba(167,139,250,0.08); color: var(--violet); border-color: rgba(167,139,250,0.2); }
+        .tag.amber { background: rgba(255,184,0,0.08); color: var(--amber); border-color: rgba(255,184,0,0.2); }
+        .tag.rose { background: rgba(244,63,94,0.08); color: var(--rose); border-color: rgba(244,63,94,0.2); }
+        .tag.cyan { background: rgba(0,212,255,0.08); color: var(--cyan); border-color: rgba(0,212,255,0.2); }
+
+        .diagram-box { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 32px; margin: 24px 0; overflow-x: auto; }
+        .diagram-box h3 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 24px; text-align: center; }
+
+        .step { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .step:last-child { border-bottom: none; }
+        .step-num { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--mint), var(--cyan)); color: var(--coal); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+        .step h4 { font-size: 15px; font-weight: 600; color: var(--white); }
+        .step p { font-size: 13px; color: var(--smoke); margin-top: 2px; }
+
+        .domain-card { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; transition: all 0.25s; }
+        .domain-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.12); }
+        .domain-header { padding: 16px 24px; color: white; font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .domain-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 100px; background: rgba(255,255,255,0.2); }
+        .domain-body { padding: 20px 24px; }
+        .domain-body li { padding: 6px 0; font-size: 13px; color: var(--smoke); list-style: none; padding-left: 20px; position: relative; }
+        .domain-body li::before { content: '→'; position: absolute; left: 0; color: var(--mint); font-weight: 700; }
+
+        .demo-container { background: linear-gradient(135deg, rgba(0,229,160,0.04), rgba(0,212,255,0.04)); border: 1px solid rgba(0,229,160,0.12); border-radius: var(--radius); padding: 40px; margin: 24px 0; position: relative; overflow: hidden; }
+        .demo-container::before { content: ''; position: absolute; top: -50%; right: -20%; width: 60%; height: 200%; background: radial-gradient(circle, rgba(0,229,160,0.06) 0%, transparent 50%); pointer-events: none; }
+        .demo-container h2 { color: var(--white); font-size: 24px; margin-bottom: 8px; position: relative; }
+        .demo-container > p { color: var(--smoke); font-size: 14px; margin-bottom: 24px; position: relative; }
+        .demo-chat { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; position: relative; }
+        .demo-chat:last-child { margin-bottom: 0; }
+        .demo-q { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.15); border-radius: 10px; padding: 14px 18px; color: var(--pearl); font-size: 14px; margin-bottom: 12px; }
+        .demo-q .label { font-size: 11px; font-weight: 700; color: var(--cyan); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .demo-a { background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.12); border-radius: 10px; padding: 14px 18px; color: var(--pearl); font-size: 13px; line-height: 1.7; }
+        .demo-a .label { font-size: 11px; font-weight: 700; color: var(--mint); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .demo-ref { display: inline-block; background: rgba(255,184,0,0.1); border: 1px solid rgba(255,184,0,0.2); color: var(--amber); font-size: 11px; padding: 3px 10px; border-radius: 6px; margin-top: 10px; }
+
+        .tech-cell { text-align: center; padding: 20px; }
+        .tech-cell-icon { font-size: 32px; margin-bottom: 10px; }
+        .tech-cell-title { font-size: 12px; font-weight: 700; color: var(--white); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .mini-hl { border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 12px; border-left: 3px solid; }
+        .mini-hl.blue { background: rgba(0,212,255,0.05); border-color: var(--cyan); }
+        .mini-hl.green { background: var(--mint-dim); border-color: var(--mint); }
+        .mini-hl.violet { background: rgba(167,139,250,0.05); border-color: var(--violet); }
+        .mini-hl.amber { background: rgba(255,184,0,0.05); border-color: var(--amber); }
+        .mini-hl h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+        .mini-hl p { font-size: 12px; color: var(--smoke); line-height: 1.6; }
+        .mini-hl strong { color: var(--pearl); }
+
+        .footer { padding: 48px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; font-size: 13px; color: var(--smoke); }
+        @media print { .nav, .tabs-bar { display: none; } .spacer { height: 20px; } .tab-panel { display: block !important; page-break-inside: avoid; margin-bottom: 40px; } }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <a href="index.html" class="nav-back">← Back to Next-Era AI</a>
+    <div class="nav-title"><span>🧠</span> MedInsight 360</div>
+</nav>
+
+<div class="tabs-bar">
+    <div class="tabs">
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="architecture">Architecture</button>
+        <button class="tab" data-tab="techstack">Tech Stack</button>
+        <button class="tab" data-tab="capabilities">Capabilities</button>
+        <button class="tab" data-tab="demo">Product Demo</button>
+        <button class="tab" data-tab="ask">Ask the Document</button>
+        <button class="tab" data-tab="extensibility">Extensibility</button>
+    </div>
+</div>
+
+<div class="spacer"></div>
+<main class="content">
+
+<!-- TAB 1: OVERVIEW -->
+<div class="tab-panel active" id="overview">
+    <h1 class="page-title">MedInsight <em>360</em></h1>
+    <p class="page-sub">Document Intelligence Platform — transforms unstructured documents into structured, actionable intelligence. Currently powering healthcare quality and risk — architected to serve any industry where insights hide in documents.</p>
+
+    <div class="grid-4">
+        <div class="stat-box"><div class="stat-val green">90%+</div><div class="stat-label">Extraction Accuracy</div></div>
+        <div class="stat-box"><div class="stat-val blue">300K+</div><div class="stat-label">Documents / Year</div></div>
+        <div class="stat-box"><div class="stat-val amber">70%</div><div class="stat-label">Time Reduction</div></div>
+        <div class="stat-box"><div class="stat-val violet">21</div><div class="stat-label">Extraction Models</div></div>
+    </div>
+
+    <div class="highlight blue">
+        <h4>🎯 High Accuracy & Reliability</h4>
+        <p>Achieves <strong>90%+ extraction accuracy</strong> through multi-model validation combining LLMs, custom ML models, and rule-based verification. Confidence scoring and evidence linking ensure reliable results for clinical decision support and quality reporting.</p>
+    </div>
+    <div class="highlight green">
+        <h4>📈 Scalable & Cost-Effective</h4>
+        <p>Processes <strong>300K+ documents per year</strong> with minimal infrastructure cost. Supports both <strong>real-time processing</strong> for urgent cases and <strong>batch mode</strong> for high-volume workflows. Multi-threaded queue management and parallel processing ensure optimal resource utilization.</p>
+    </div>
+    <div class="highlight blue">
+        <h4>💡 What Is MedInsight 360?</h4>
+        <p>A full-stack document intelligence platform that ingests PDFs and unstructured documents, applies AI/ML extraction pipelines, and delivers structured data — quality measure compliance, diagnostic coding, clinical highlights, and more. Reviewers interact with an intelligent web interface to validate, query, and export results. <strong>No Salesforce dependency — runs as a standalone web application that can plug into any workflow or system.</strong></p>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">🎯 Core Value Proposition</div>
+            <p>MedInsight 360 doesn't just read documents — it <strong>understands</strong> them. Using a combination of LLMs, ML models, and NLP, it extracts domain-specific intelligence with clinical-grade precision.</p>
+            <div class="tags">
+                <span class="tag blue">Quality Measures</span>
+                <span class="tag mint">Diagnostic Coding</span>
+                <span class="tag violet">Clinical Highlights</span>
+                <span class="tag amber">Evidence Mapping</span>
+                <span class="tag rose">Temporal Analysis</span>
+                <span class="tag cyan">Conversational Q&A</span>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">🏗️ Design Philosophy</div>
+            <p style="margin-bottom: 16px;">Built on three pillars that ensure production readiness:</p>
+            <div class="mini-hl green"><h4>✅ Accuracy First</h4><p>Multi-model validation ensures extraction precision above 90%. ML models cross-reference LLM outputs against clinical coding rules.</p></div>
+            <div class="mini-hl amber"><h4>⚡ Plugin Architecture</h4><p>Every extraction module is a self-contained plugin. Add new document types or domains without touching core infrastructure.</p></div>
+            <div class="mini-hl violet"><h4>🔌 Integration-Ready</h4><p>Standalone web platform with REST APIs. Plug into EHR systems, workflow engines, or any enterprise environment.</p></div>
+        </div>
+    </div>
+
+    <div class="highlight green">
+        <h4>🌐 Industry-Agnostic Architecture</h4>
+        <p>While currently optimized for <strong>Healthcare Quality & Risk</strong> (extracting quality measures and diagnostic coding data), the underlying platform is domain-agnostic. The same extraction engine, plugin architecture, and reviewer interface can be customized for <strong>insurance claims processing, legal document review, regulatory compliance, financial auditing, transportation safety documentation</strong>, or any domain where actionable insights must be extracted from unstructured documents.</p>
+    </div>
+</div>
+
+<!-- TAB 2: ARCHITECTURE -->
+<div class="tab-panel" id="architecture">
+    <h1 class="page-title">System <em>Architecture</em></h1>
+    <p class="page-sub">Four-layer architecture designed for scalability, extensibility, and production reliability.</p>
+
+    <div class="diagram-box">
+        <h3>High-Level Architecture</h3>
+        <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px; margin:0 auto; display:block;">
+            <defs>
+                <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00e5a0"/><stop offset="100%" style="stop-color:#00d4ff"/></linearGradient>
+                <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient>
+                <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#a78bfa"/><stop offset="100%" style="stop-color:#f43f5e"/></linearGradient>
+                <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#ffb800"/><stop offset="100%" style="stop-color:#ff6b6b"/></linearGradient>
+                <filter id="ds"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.3" flood-color="#000"/></filter>
+            </defs>
+            <rect x="30" y="20" width="840" height="100" rx="12" fill="url(#g1)" filter="url(#ds)" opacity="0.9"/>
+            <text x="60" y="52" fill="white" font-size="14" font-weight="800" font-family="DM Sans, sans-serif">PRESENTATION LAYER</text>
+            <text x="60" y="72" fill="rgba(255,255,255,0.75)" font-size="11" font-family="DM Sans, sans-serif">Web Review Interface · REST API · Export Engine · Real-time Dashboard</text>
+            <rect x="60" y="85" width="110" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="84" y="103" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Web App</text>
+            <rect x="182" y="85" width="110" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="206" y="103" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">REST API</text>
+            <rect x="304" y="85" width="140" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="326" y="103" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Export Engine</text>
+            <rect x="456" y="85" width="140" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="478" y="103" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Admin Console</text>
+            <path d="M450,120 L450,140" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4"/><polygon points="445,140 455,140 450,148" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="150" width="840" height="120" rx="12" fill="url(#g2)" filter="url(#ds)" opacity="0.9"/>
+            <text x="60" y="182" fill="white" font-size="14" font-weight="800" font-family="DM Sans, sans-serif">AI / ML INTELLIGENCE LAYER</text>
+            <text x="60" y="202" fill="rgba(255,255,255,0.75)" font-size="11" font-family="DM Sans, sans-serif">LLM Extraction · ML Coding Models · NLP Pipeline · Multi-Model Validation</text>
+            <rect x="60" y="218" width="120" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="80" y="236" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">LLM Engine</text>
+            <rect x="192" y="218" width="130" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="216" y="236" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">ML Models</text>
+            <rect x="334" y="218" width="140" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="358" y="236" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">NLP Pipeline</text>
+            <rect x="486" y="218" width="150" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="510" y="236" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Plugin Factory</text>
+            <rect x="648" y="218" width="160" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="668" y="236" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Validation Engine</text>
+            <path d="M450,270 L450,290" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4"/><polygon points="445,290 455,290 450,298" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="300" width="840" height="100" rx="12" fill="url(#g3)" filter="url(#ds)" opacity="0.9"/>
+            <text x="60" y="332" fill="white" font-size="14" font-weight="800" font-family="DM Sans, sans-serif">PROCESSING LAYER</text>
+            <text x="60" y="352" fill="rgba(255,255,255,0.75)" font-size="11" font-family="DM Sans, sans-serif">OCR · Document Parsing · Multi-threaded Queue · Parallel Processing</text>
+            <rect x="60" y="365" width="130" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="84" y="383" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">OCR Engine</text>
+            <rect x="202" y="365" width="140" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="228" y="383" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Doc Parser</text>
+            <rect x="354" y="365" width="160" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="378" y="383" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Queue Manager</text>
+            <rect x="526" y="365" width="160" height="26" rx="13" fill="rgba(255,255,255,0.2)"/><text x="546" y="383" fill="white" font-size="10" font-weight="600" font-family="DM Sans, sans-serif">Batch Processor</text>
+            <path d="M450,400 L450,420" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4"/><polygon points="445,420 455,420 450,428" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="430" width="840" height="75" rx="12" fill="url(#g4)" filter="url(#ds)" opacity="0.9"/>
+            <text x="60" y="462" fill="white" font-size="14" font-weight="800" font-family="DM Sans, sans-serif">DATA & STORAGE LAYER</text>
+            <text x="60" y="480" fill="rgba(255,255,255,0.75)" font-size="11" font-family="DM Sans, sans-serif">SQL Database · Blob Storage · Configuration Store · JSON Rule Engine</text>
+        </svg>
+    </div>
+
+    <div class="highlight blue">
+        <h4>🔌 Plugin Module Architecture</h4>
+        <p>Every extraction domain (quality measures, diagnostic coding, clinical highlights, etc.) is implemented as a self-contained plugin module. Each plugin defines its own LLM prompts, ML model configurations, validation rules, and output schemas — registered through a <strong>Factory Pattern</strong> that allows new domains to be added with zero changes to the core engine.</p>
+    </div>
+
+    <div class="grid-3">
+        <div class="feature-card"><div class="feature-icon" style="background: var(--mint-dim);">🧩</div><h3>Plugin Registration</h3><p>Each domain plugin self-registers with the factory. The core engine dynamically loads extraction modules based on document type and configuration.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(0,212,255,0.08);">🔄</div><h3>Shared Infrastructure</h3><p>OCR, document parsing, queue management, and API endpoints are shared. Plugins only define domain-specific extraction logic.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(167,139,250,0.08);">📦</div><h3>Isolated Deployment</h3><p>Plugins can be enabled/disabled independently. Deploy new extraction domains without redeploying the entire platform.</p></div>
+    </div>
+</div>
+
+<!-- TAB 3: TECH STACK -->
+<div class="tab-panel" id="techstack">
+    <h1 class="page-title">Technology <em>Stack</em></h1>
+    <p class="page-sub">Enterprise-grade technology stack combining LLMs, ML models, and production-hardened infrastructure.</p>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">🧠 AI & ML Layer</div>
+            <div class="mini-hl blue"><h4>Large Language Models</h4><p>Azure OpenAI GPT-4o-mini for document understanding, clinical reasoning, and evidence extraction. Multi-prompt chains with structured JSON outputs.</p></div>
+            <div class="mini-hl green"><h4>Machine Learning Models</h4><p>Custom-trained ML models for diagnostic code extraction and risk adjustment. Classification models map clinical evidence to ICD-10 codes and HCC categories with confidence scoring.</p></div>
+            <div class="mini-hl violet"><h4>NLP Pipeline</h4><p>Multi-stage NLP for entity recognition, temporal extraction, negation detection, and clinical term normalization. Tesseract OCR for scanned documents.</p></div>
+            <div class="mini-hl amber"><h4>Validation Engine</h4><p>Cross-model validation compares LLM outputs against ML predictions. Confidence scoring with HIGH/MEDIUM/LOW classification for reviewer triage.</p></div>
+        </div>
+        <div class="card">
+            <div class="card-header">⚙️ Infrastructure</div>
+            <div class="mini-hl blue"><h4>Processing Engine</h4><p>Python multi-threaded architecture with queue management. Parallel document processing with configurable concurrency, retry logic, and failure recovery.</p></div>
+            <div class="mini-hl green"><h4>Data Storage</h4><p>SQL Server for structured extraction results. Azure Blob Storage for document repository. JSON-based configuration for rule engines and extraction schemas.</p></div>
+            <div class="mini-hl violet"><h4>Web Platform</h4><p>Modern web application built for reviewer workflows. Real-time document viewer, interactive panels, and export capabilities. <strong>Standalone — integrates with any workflow or system via REST APIs.</strong></p></div>
+            <div class="mini-hl amber"><h4>Enterprise Security</h4><p>Role-based access control, encrypted data at rest and in transit, audit logging, and HIPAA-compliant infrastructure. No PHI stored in LLM context windows.</p></div>
+        </div>
+    </div>
+
+    <div class="diagram-box">
+        <h3>Technology Ecosystem</h3>
+        <div class="grid-4" style="margin-bottom:0;">
+            <div class="tech-cell"><div class="tech-cell-icon">🤖</div><div class="tech-cell-title">AI Models</div><div class="tags" style="justify-content: center;"><span class="tag blue">GPT-4o-mini</span><span class="tag mint">Custom ML</span><span class="tag violet">Tesseract OCR</span></div></div>
+            <div class="tech-cell"><div class="tech-cell-icon">⚡</div><div class="tech-cell-title">Processing</div><div class="tags" style="justify-content: center;"><span class="tag blue">Python</span><span class="tag mint">Multi-thread</span><span class="tag amber">Queue Mgmt</span></div></div>
+            <div class="tech-cell"><div class="tech-cell-icon">💾</div><div class="tech-cell-title">Storage</div><div class="tags" style="justify-content: center;"><span class="tag blue">SQL Server</span><span class="tag mint">Azure Blob</span><span class="tag amber">JSON Config</span></div></div>
+            <div class="tech-cell"><div class="tech-cell-icon">🌐</div><div class="tech-cell-title">Platform</div><div class="tags" style="justify-content: center;"><span class="tag blue">Web App</span><span class="tag mint">REST API</span><span class="tag violet">Flask Admin</span></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 4: CAPABILITIES -->
+<div class="tab-panel" id="capabilities">
+    <h1 class="page-title">Platform <em>Capabilities</em></h1>
+    <p class="page-sub">Comprehensive document intelligence features — from intelligent extraction to interactive analysis.</p>
+
+    <div class="grid-3">
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(0,212,255,0.08);">🔍</div><h3>Intelligent Data Extraction</h3><p>Automatically identifies and extracts key data points from unstructured documents. Coordinate-level highlighting shows exactly where evidence was found across hundreds of pages.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: var(--mint-dim);">📊</div><h3>Compliance Dashboard</h3><p>Real-time compliance scoring with Met/Not Met/Pending status for each extraction measure. Confidence levels (HIGH/MEDIUM/LOW) enable intelligent reviewer triage and prioritization.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(167,139,250,0.08);">💬</div><h3>Conversational Q&A</h3><p>Ask natural language questions about any document and receive AI-powered answers with page-level references. <strong>Pre-populated example questions with dynamic Q&A in development.</strong></p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(255,184,0,0.08);">🧬</div><h3>ML-Powered Coding</h3><p>Machine learning models extract diagnostic codes with evidence mapping. Each code includes confidence scores, clinical reasoning, and direct references to supporting documentation.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(244,63,94,0.08);">📅</div><h3>Temporal Intelligence</h3><p>Timeline view reconstructs the chronological history of events from documents — visits, procedures, results, and milestones. Supports multi-year longitudinal analysis.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(0,212,255,0.08);">🔎</div><h3>Cross-Document Search</h3><p>Full-text search across all documents with page-level navigation. Search results show context snippets and jump directly to the relevant section in the document viewer.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: var(--mint-dim);">🧩</div><h3>Plugin Architecture</h3><p>Every extraction domain is a self-contained plugin. Add new document types, extraction rules, or entire domains without modifying core infrastructure. Zero-downtime deployment.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(167,139,250,0.08);">⚡</div><h3>Parallel Processing</h3><p>Multi-threaded batch processing with configurable concurrency. Queue management with priority scheduling, retry logic, and real-time progress tracking.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(255,184,0,0.08);">📤</div><h3>Export & Integration</h3><p>Export extraction results to CSV, JSON, or integrate directly via REST APIs. Webhook support for real-time notifications. Connect to any downstream system or workflow.</p></div>
+    </div>
+</div>
+
+<!-- TAB 5: PRODUCT DEMO -->
+<div class="tab-panel" id="demo">
+    <h1 class="page-title">Product <em>Demo</em></h1>
+    <p class="page-sub">See MedInsight 360 in action — from document upload to AI-powered extraction and reviewer validation.</p>
+
+    <div class="demo-container">
+        <h2>🎬 MedInsight 360 — Live Walkthrough</h2>
+        <p>Watch how the platform processes documents, extracts intelligence, and presents results to reviewers.</p>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 80px 40px; text-align: center; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="font-size: 48px; margin-bottom: 16px;">▶️</div>
+            <div style="color: var(--white); font-size: 18px; font-weight: 600; margin-bottom: 8px;">Product Demo Video</div>
+            <div style="color: var(--smoke); font-size: 14px;">Coming soon — click to play when available</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">How It Works</h2>
+    <div class="card">
+        <div class="step"><div class="step-num">1</div><div><h4>Upload Documents</h4><p>Upload PDFs, scanned documents, or digital files. The system auto-detects document type and routes to the appropriate extraction pipeline.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div><h4>AI Processing</h4><p>OCR converts scanned pages to text. LLMs extract domain-specific data points. ML models validate and cross-reference results. Confidence scores assigned.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div><h4>Review & Validate</h4><p>Reviewers see extracted data alongside the original document with coordinate-level highlighting. Accept, modify, or flag results.</p></div></div>
+        <div class="step"><div class="step-num">4</div><div><h4>Ask Questions</h4><p>Use the conversational Q&A interface to ask follow-up questions. Get AI-powered answers with page-level source references.</p></div></div>
+        <div class="step"><div class="step-num">5</div><div><h4>Export & Integrate</h4><p>Export validated results to CSV, JSON, or push directly to downstream systems via REST APIs. Full audit trail maintained.</p></div></div>
+    </div>
+</div>
+
+<!-- TAB 6: ASK THE DOCUMENT -->
+<div class="tab-panel" id="ask">
+    <h1 class="page-title">Ask the <em>Document™</em></h1>
+    <p class="page-sub">Natural language queries against any document — powered by RAG and multi-model AI.</p>
+
+    <div class="demo-container">
+        <h2>💬 Conversational Document Intelligence</h2>
+        <p>Reviewers don't just read documents — they interrogate them. Ask any question, get evidence-backed answers with page references.</p>
+        <div class="demo-chat">
+            <div class="demo-q"><div class="label">👤 Reviewer Question</div>What are the blood pressure values recorded for this patient in 2024? What is the date of service?</div>
+            <div class="demo-a"><div class="label">🤖 AI Response</div>Based on the medical records, the following BP values were recorded in 2024:<br>• 163/114 (02/12/2024)<br>• 151/79 (04/15/2024)<br>• 113/74 (07/19/2024)<br><br>The most recent date of service is 07/19/2024.<div class="demo-ref">📄 References: Page 4, Page 5, Page 9, Page 10, Page 16</div></div>
+        </div>
+        <div class="demo-chat">
+            <div class="demo-q"><div class="label">👤 Reviewer Question</div>Does this patient have a documented diagnosis of diabetes?</div>
+            <div class="demo-a"><div class="label">🤖 AI Response</div>Yes. The patient has a documented diagnosis of Type 2 diabetes mellitus with diabetic chronic kidney disease (HCC) - Primary (Chronic). Multiple Hemoglobin A1c test results are documented within the measurement year. Confidence: HIGH<div class="demo-ref">📄 References: Page 1, Page 4, Page 6, Page 12, Page 16</div></div>
+        </div>
+        <div class="demo-chat">
+            <div class="demo-q"><div class="label">👤 Reviewer Question</div>What medications is the patient currently taking?</div>
+            <div class="demo-a"><div class="label">🤖 AI Response</div>Current medications include: Semaglutide (Rybelsus) 7 MG, Cholecalciferol (Vitamin D-3) 25 MCG, Losartan (Cozaar) 25 MG, Farxiga 10mg, and Metformin 1000mg daily.<div class="demo-ref">📄 References: Page 1, Page 14</div></div>
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(0,212,255,0.08);">🧠</div><h3>Context-Aware Reasoning</h3><p>The AI doesn't just search for keywords — it understands clinical context, temporal relationships, and domain-specific terminology to provide precise answers.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: var(--mint-dim);">📄</div><h3>Source Attribution</h3><p>Every answer includes page-level references. Click any reference to jump directly to the supporting evidence in the document viewer for instant verification.</p></div>
+        <div class="feature-card"><div class="feature-icon" style="background: rgba(255,184,0,0.08);">⚡</div><h3>Predefined + Free-form</h3><p>Domain-specific question libraries pre-loaded for each document type, plus free-form natural language queries for ad-hoc investigation.</p></div>
+    </div>
+
+    <div class="highlight green">
+        <h4>🚀 Beyond Healthcare</h4>
+        <p>The "Ask the Document" capability is domain-agnostic. Imagine asking a legal contract: <em>"What are the termination clauses?"</em>, or a financial report: <em>"What was Q3 revenue compared to Q2?"</em>, or a safety inspection: <em>"Were there any critical violations?"</em>. The same RAG pipeline, LLM reasoning, and source attribution work across any document type.</p>
+    </div>
+</div>
+
+<!-- TAB 7: EXTENSIBILITY -->
+<div class="tab-panel" id="extensibility">
+    <h1 class="page-title">Extensibility & <em>Vision</em></h1>
+    <p class="page-sub">A foundation platform designed to grow — new domains, new industries, new capabilities.</p>
+
+    <div class="highlight blue">
+        <h4>🌍 Platform Vision</h4>
+        <p>MedInsight 360 is built as a <strong>Document Intelligence Foundation</strong> — not a point solution. The core engine (OCR, LLM extraction, ML validation, plugin architecture, reviewer interface) is domain-agnostic. Domain expertise is encapsulated in plugins that can be developed, tested, and deployed independently. This means the platform can be extended to <strong>any industry</strong> where insights need to be extracted from unstructured documents.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="domain-card"><div class="domain-header" style="background: linear-gradient(135deg, #00e5a0, #00b377);">🏥 Healthcare (Active)<span class="domain-badge">IN PRODUCTION</span></div><div class="domain-body"><ul><li>Quality measure compliance extraction</li><li>Diagnostic code identification (ICD-10/HCC)</li><li>Clinical highlight & evidence mapping</li><li>Temporal health event reconstruction</li><li>Conversational clinical Q&A</li><li>Cross-document search & navigation</li></ul></div></div>
+        <div class="domain-card"><div class="domain-header" style="background: linear-gradient(135deg, #00d4ff, #0099cc);">📋 Insurance & Claims<span class="domain-badge">READY</span></div><div class="domain-body"><ul><li>Claims document ingestion & classification</li><li>Policy coverage verification</li><li>Damage assessment extraction</li><li>Fraud indicator detection</li><li>Regulatory compliance validation</li><li>Automated adjudication support</li></ul></div></div>
+        <div class="domain-card"><div class="domain-header" style="background: linear-gradient(135deg, #a78bfa, #7c3aed);">⚖️ Legal & Compliance<span class="domain-badge">READY</span></div><div class="domain-body"><ul><li>Contract clause extraction & analysis</li><li>Regulatory filing compliance checks</li><li>Risk term identification & flagging</li><li>Cross-reference clause dependencies</li><li>Obligation and deadline tracking</li><li>Due diligence document review</li></ul></div></div>
+    </div>
+    <div class="grid-3">
+        <div class="domain-card"><div class="domain-header" style="background: linear-gradient(135deg, #ffb800, #e6a600);">🚛 Transportation & Safety<span class="domain-badge">READY</span></div><div class="domain-body"><ul><li>Safety inspection report analysis</li><li>Compliance documentation review</li><li>Incident report data extraction</li><li>Maintenance record tracking</li><li>Regulatory violation flagging</li><li>Fleet documentation management</li></ul></div></div>
+        <div class="domain-card"><div class="domain-header" style="background: linear-gradient(135deg, #00d4ff, #0099cc);">💰 Financial Services<span class="domain-badge">READY</span></div><div class="domain-body"><ul><li>Financial statement data extraction</li><li>Audit report compliance checking</li><li>KYC/AML document processing</li><li>Loan application data extraction</li><li>Investment prospectus analysis</li><li>Regulatory filing automation</li></ul></div></div>
+        <div class="domain-card"><div class="domain-header" style="background: linear-gradient(135deg, #f43f5e, #e11d48);">🏭 Manufacturing & QA<span class="domain-badge">READY</span></div><div class="domain-body"><ul><li>Quality control report analysis</li><li>Supplier certification verification</li><li>Non-conformance report extraction</li><li>Standards compliance tracking</li><li>Equipment maintenance records</li><li>Process documentation review</li></ul></div></div>
+    </div>
+
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header">🔧 Adding a New Domain: What It Takes</div>
+        <div class="grid-2" style="margin-bottom: 0;">
+            <div>
+                <div class="step"><div class="step-num">1</div><div><h4>Define Extraction Schema</h4><p>Specify what data points to extract, their types, and validation rules via JSON configuration.</p></div></div>
+                <div class="step"><div class="step-num">2</div><div><h4>Create LLM Prompts</h4><p>Design domain-specific prompts that instruct the LLM how to identify and extract target information.</p></div></div>
+                <div class="step"><div class="step-num">3</div><div><h4>Train ML Models (Optional)</h4><p>For domains requiring classification (like diagnostic coding), train supervised models on labeled data.</p></div></div>
+            </div>
+            <div>
+                <div class="step"><div class="step-num">4</div><div><h4>Build Question Library</h4><p>Create predefined Q&A templates for the "Ask the Document" feature. Free-form queries work immediately.</p></div></div>
+                <div class="step"><div class="step-num">5</div><div><h4>Register Plugin</h4><p>Register the new domain with the factory. The core engine handles all processing, storage, and UI automatically.</p></div></div>
+                <div class="step"><div class="step-num">6</div><div><h4>Deploy & Validate</h4><p>Zero-downtime deployment. Run validation against sample documents and calibrate extraction accuracy.</p></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer class="footer"><p>Next-Era AI — MedInsight 360 Document Intelligence Platform</p></footer>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+</script>
+</body>
+</html>

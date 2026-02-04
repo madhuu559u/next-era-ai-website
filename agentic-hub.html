@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Hub — Next-Era AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --coal: #0a0a0a; --onyx: #141414; --graphite: #1a1a1a; --slate: #2a2a2a; --ash: #3a3a3a;
+            --smoke: #7a7a7a; --silver: #a0a0a0; --pearl: #d4d4d4; --ivory: #f0f0f0; --white: #fafafa;
+            --mint: #00e5a0; --mint-glow: rgba(0,229,160,0.15); --mint-dim: rgba(0,229,160,0.08);
+            --cyan: #00d4ff; --amber: #ffb800; --coral: #ff6b6b; --violet: #a78bfa;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius: 16px; --radius-sm: 10px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-body); background: var(--coal); color: var(--pearl); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+        .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,10,0.85); backdrop-filter: blur(24px) saturate(1.4); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .nav-back { color: var(--smoke); text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+        .nav-back:hover { color: var(--white); }
+        .nav-title { font-size: 15px; font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 10px; }
+
+        .tabs-bar { position: fixed; top: 64px; left: 0; right: 0; z-index: 99; background: var(--onyx); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 48px; }
+        .tabs { display: flex; gap: 4px; overflow-x: auto; }
+        .tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--smoke); background: none; border: none; cursor: pointer; white-space: nowrap; transition: all 0.2s; position: relative; font-family: var(--font-body); }
+        .tab:hover { color: var(--pearl); }
+        .tab.active { color: var(--mint); }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--mint); }
+
+        .spacer { height: 120px; }
+        .content { max-width: 1200px; margin: 0 auto; padding: 40px 48px; }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title { font-family: var(--font-display); font-size: 42px; color: var(--white); margin-bottom: 8px; font-weight: 400; }
+        .page-title em { font-style: italic; color: var(--mint); }
+        .page-sub { font-size: 16px; color: var(--smoke); margin-bottom: 40px; max-width: 700px; }
+        .section-title { font-family: var(--font-display); font-size: 28px; color: var(--white); margin: 48px 0 16px; font-weight: 400; }
+        .section-title:first-child { margin-top: 0; }
+
+        .card { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; }
+        .card-header { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .card p, .card li { color: var(--smoke); font-size: 14px; line-height: 1.7; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        @media (max-width: 1024px) { .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .content { padding: 24px; } .tabs-bar, .nav { padding: 0 16px; } }
+
+        .stat-box { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 24px; text-align: center; }
+        .stat-val { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--mint); }
+        .stat-label { font-size: 12px; color: var(--smoke); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        .highlight { padding: 24px 28px; border-radius: var(--radius-sm); margin: 24px 0; border-left: 4px solid; }
+        .highlight.green { background: var(--mint-dim); border-color: var(--mint); }
+        .highlight.blue { background: rgba(0,212,255,0.06); border-color: var(--cyan); }
+        .highlight.amber { background: rgba(255,184,0,0.06); border-color: var(--amber); }
+        .highlight h4 { color: var(--white); margin-bottom: 8px; }
+        .highlight p { color: var(--silver); font-size: 14px; }
+
+        .check-list { list-style: none; padding: 0; }
+        .check-list li { padding: 10px 0; display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--pearl); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .check-list li:last-child { border-bottom: none; }
+        .check-icon { color: var(--mint); font-weight: 700; flex-shrink: 0; }
+
+        .agent-card { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 28px; transition: border-color 0.2s; }
+        .agent-card:hover { border-color: rgba(0,229,160,0.2); }
+        .agent-icon { font-size: 36px; margin-bottom: 12px; }
+        .agent-name { font-size: 16px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+        .agent-desc { font-size: 13px; color: var(--smoke); line-height: 1.6; }
+        .agent-status { display: inline-block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; padding: 3px 10px; border-radius: 100px; }
+        .status-live { background: var(--mint-glow); color: var(--mint); }
+        .status-dev { background: rgba(255,184,0,0.1); color: var(--amber); }
+        .status-planned { background: rgba(167,139,250,0.1); color: var(--violet); }
+
+        /* ─── MOCKUP ─── */
+        .mockup-container { background: var(--graphite); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); overflow: hidden; margin: 32px 0; }
+        .mockup-titlebar { background: var(--slate); padding: 12px 20px; display: flex; align-items: center; gap: 8px; }
+        .mockup-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .mockup-dot.r { background: #ff5f57; }
+        .mockup-dot.y { background: #febc2e; }
+        .mockup-dot.g { background: #28c840; }
+        .mockup-body { display: grid; grid-template-columns: 280px 1fr 300px; min-height: 500px; }
+        .mockup-sidebar { background: var(--onyx); padding: 24px; border-right: 1px solid rgba(255,255,255,0.06); }
+        .mockup-chat { padding: 24px; display: flex; flex-direction: column; }
+        .mockup-panel { background: var(--onyx); padding: 24px; border-left: 1px solid rgba(255,255,255,0.06); }
+
+        .sidebar-item { padding: 12px 16px; border-radius: 8px; margin-bottom: 4px; font-size: 13px; color: var(--smoke); cursor: default; display: flex; align-items: center; gap: 10px; }
+        .sidebar-item.active { background: var(--mint-glow); color: var(--mint); }
+        .sidebar-item:hover { background: rgba(255,255,255,0.04); }
+
+        .chat-bubble { padding: 14px 18px; border-radius: 14px; font-size: 13px; line-height: 1.6; margin-bottom: 12px; max-width: 85%; }
+        .chat-user { background: rgba(0,229,160,0.12); color: var(--pearl); margin-left: auto; border-bottom-right-radius: 4px; }
+        .chat-agent { background: var(--slate); color: var(--pearl); border-bottom-left-radius: 4px; }
+
+        .panel-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--smoke); margin-bottom: 16px; }
+        .panel-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .panel-item-label { font-size: 11px; color: var(--smoke); }
+        .panel-item-value { font-size: 13px; color: var(--pearl); }
+
+        @media (max-width: 1024px) { .mockup-body { grid-template-columns: 1fr; } .mockup-sidebar, .mockup-panel { display: none; } }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .tag { font-size: 12px; padding: 4px 14px; border-radius: 100px; background: rgba(255,255,255,0.04); color: var(--silver); border: 1px solid rgba(255,255,255,0.08); }
+
+        .footer { padding: 48px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; font-size: 13px; color: var(--smoke); }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <a href="index.html" class="nav-back">← Back to Next-Era AI</a>
+    <div class="nav-title"><span>🤖</span> Agentic AI Hub</div>
+</nav>
+
+<div class="tabs-bar">
+    <div class="tabs">
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="agents">AI Agents</button>
+        <button class="tab" data-tab="ui">UI & Experience</button>
+        <button class="tab" data-tab="architecture">Architecture</button>
+        <button class="tab" data-tab="live">Live Solutions</button>
+        <button class="tab" data-tab="usecases">Use Cases</button>
+        <button class="tab" data-tab="roadmap">Roadmap</button>
+    </div>
+</div>
+
+<div class="spacer"></div>
+<main class="content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div class="tab-panel active" id="overview">
+        <h1 class="page-title">Agentic AI <em>Hub</em></h1>
+        <p class="page-sub">A unified Agentic AI Hub — the single intelligent gateway to every enterprise operation. Multi-agent architecture that orchestrates specialized AI agents for member services, claims, benefits, pharmacy, provider inquiries, and beyond. Ready to customize for any industry.</p>
+
+        <div class="grid-4">
+            <div class="stat-box"><div class="stat-val">12+</div><div class="stat-label">AI Agents</div></div>
+            <div class="stat-box"><div class="stat-val">25+</div><div class="stat-label">Use Cases</div></div>
+            <div class="stat-box"><div class="stat-val">6</div><div class="stat-label">Live Solutions</div></div>
+            <div class="stat-box"><div class="stat-val">10+</div><div class="stat-label">Salesforce APIs</div></div>
+        </div>
+
+        <div class="highlight green">
+            <h4>🎯 Vision</h4>
+            <p>One conversational interface to access everything — member data, claims status, benefits details, pharmacy info, provider networks. Instead of navigating 10 different screens and systems, ask a question in plain language and let specialized AI agents fetch, analyze, and present the answer.</p>
+        </div>
+
+        <h2 class="section-title">What Makes This Different</h2>
+        <div class="grid-2">
+            <div class="card" style="border-left: 3px solid var(--coral);">
+                <div class="card-header" style="color: var(--coral);">❌ Today's Workflow</div>
+                <ul class="check-list">
+                    <li><span style="color: var(--coral);">✕</span> Navigate 10+ screens for a single member inquiry</li>
+                    <li><span style="color: var(--coral);">✕</span> Manual cross-referencing between systems</li>
+                    <li><span style="color: var(--coral);">✕</span> Copy-paste data between Salesforce, PEGA, portals</li>
+                    <li><span style="color: var(--coral);">✕</span> Training burden for new agents (6+ weeks)</li>
+                    <li><span style="color: var(--coral);">✕</span> Siloed information, no unified view</li>
+                </ul>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header" style="color: var(--mint);">✅ MedInsight 360 Vision</div>
+                <ul class="check-list">
+                    <li><span class="check-icon">✓</span> Single conversational interface for everything</li>
+                    <li><span class="check-icon">✓</span> AI agents auto-fetch from all connected systems</li>
+                    <li><span class="check-icon">✓</span> Intelligent routing to the right agent</li>
+                    <li><span class="check-icon">✓</span> Guided workflows with contextual suggestions</li>
+                    <li><span class="check-icon">✓</span> Unified 360° member view in real-time</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title">Connected Systems</h2>
+        <div class="tags" style="margin-top: 0;">
+            <span class="tag">Salesforce (Member/Claims/Benefits)</span>
+            <span class="tag">PEGA (Authorization/UM)</span>
+            <span class="tag">Pharmacy Systems</span>
+            <span class="tag">Provider Directory</span>
+            <span class="tag">Azure AI Search (Knowledge Base)</span>
+            <span class="tag">MS Teams</span>
+            <span class="tag">Azure OpenAI</span>
+            <span class="tag">Mulesoft APIs</span>
+        </div>
+    </div>
+
+    <!-- ═══ AGENTS ═══ -->
+    <div class="tab-panel" id="agents">
+        <h1 class="page-title">AI <em>Agents</em></h1>
+        <p class="page-sub">Specialized agents for every healthcare domain, orchestrated by an intelligent router that understands intent and delegates to the right expert.</p>
+
+        <h2 class="section-title">Orchestration Layer</h2>
+        <div class="card" style="border-left: 3px solid var(--mint);">
+            <div class="card-header">🧠 Master Orchestrator Agent</div>
+            <p>The central routing intelligence. Receives every user query, classifies intent, identifies the required domain, and delegates to one or more specialized agents. Handles multi-turn conversations, maintains context, and can chain agents for complex workflows.</p>
+        </div>
+
+        <h2 class="section-title">Support Center Agents</h2>
+        <div class="grid-3">
+            <div class="agent-card">
+                <div class="agent-icon">👤</div>
+                <div class="agent-name">Member Search Agent</div>
+                <div class="agent-desc">Search members by name, ID, DOB, address, or natural language. Returns demographics, enrollment, and plan details from Salesforce.</div>
+                <span class="agent-status status-live">● Live</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">🏥</div>
+                <div class="agent-name">Claims Agent</div>
+                <div class="agent-desc">Look up claim status, denied claims with reasons, EOB details, and payment timelines. Provides next-step recommendations for denied claims.</div>
+                <span class="agent-status status-dev">● In Dev</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">📋</div>
+                <div class="agent-name">Benefits Agent</div>
+                <div class="agent-desc">Retrieves plan benefits, copays, deductibles, OTC allowances, supplemental benefits. RAG-powered EOC document search for complex queries.</div>
+                <span class="agent-status status-live">● Live</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">💊</div>
+                <div class="agent-name">Pharmacy Agent</div>
+                <div class="agent-desc">Formulary search, drug coverage verification, prior authorization status, cost estimation, and drug interaction alerts.</div>
+                <span class="agent-status status-planned">● Planned</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">👨‍⚕️</div>
+                <div class="agent-name">Provider Network Agent</div>
+                <div class="agent-desc">Provider search by specialty, location, accepting new patients. Network status verification and referral routing guidance.</div>
+                <span class="agent-status status-planned">● Planned</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">📞</div>
+                <div class="agent-name">Call Summary Agent</div>
+                <div class="agent-desc">Auto-generates structured summaries for every call interaction. Extracts key topics, action items, and follow-up requirements.</div>
+                <span class="agent-status status-live">● Live</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">🚗</div>
+                <div class="agent-name">Transportation Agent</div>
+                <div class="agent-desc">Schedules member transportation, checks eligibility, tracks ride status, and manages trip modifications.</div>
+                <span class="agent-status status-planned">● Planned</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">📝</div>
+                <div class="agent-name">Authorization Agent</div>
+                <div class="agent-desc">Prior authorization status lookup, submission guidance, appeal routing, and clinical review requirements.</div>
+                <span class="agent-status status-dev">● In Dev</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">🔍</div>
+                <div class="agent-name">Knowledge Agent</div>
+                <div class="agent-desc">RAG-powered search across knowledge base, job aids, procedures, and SOPs. Context-aware answers with source references.</div>
+                <span class="agent-status status-live">● Live</span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Operations &amp; Quality Agents</h2>
+        <div class="grid-3">
+            <div class="agent-card">
+                <div class="agent-icon">✅</div>
+                <div class="agent-name">Quality Audit Agent</div>
+                <div class="agent-desc">Automated quality scoring across 17 KPIs. Reviews call recordings against compliance checklist with AI-generated audit reports.</div>
+                <span class="agent-status status-live">● Live</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">📠</div>
+                <div class="agent-name">Fax Processing Agent</div>
+                <div class="agent-desc">Azure Document Intelligence + GPT-4 Vision for automated fax intake, classification, and case creation in Salesforce.</div>
+                <span class="agent-status status-live">● Live</span>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">💬</div>
+                <div class="agent-name">Campaign Agent</div>
+                <div class="agent-desc">Automated multi-channel outreach campaigns with personalized messaging, response tracking, and engagement scoring.</div>
+                <span class="agent-status status-dev">● In Dev</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ UI EXPERIENCE ═══ -->
+    <div class="tab-panel" id="ui">
+        <h1 class="page-title">UI &amp; <em>Experience</em></h1>
+        <p class="page-sub">A conversational interface that makes 10 systems feel like one. Ask anything, get answers with evidence.</p>
+
+        <div class="mockup-container">
+            <div class="mockup-titlebar">
+                <span class="mockup-dot r"></span><span class="mockup-dot y"></span><span class="mockup-dot g"></span>
+                <span style="margin-left: 12px; font-size: 13px; color: var(--smoke);">MedInsight 360 — Agentic AI Hub</span>
+            </div>
+            <div class="mockup-body">
+                <div class="mockup-sidebar">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 16px;">🧠 Agents</div>
+                    <div class="sidebar-item active">👤 Member Search</div>
+                    <div class="sidebar-item">🏥 Claims Lookup</div>
+                    <div class="sidebar-item">📋 Benefits Check</div>
+                    <div class="sidebar-item">💊 Pharmacy</div>
+                    <div class="sidebar-item">👨‍⚕️ Provider Search</div>
+                    <div class="sidebar-item">🔍 Knowledge Base</div>
+                    <div class="sidebar-item">📝 Authorization</div>
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--smoke); margin-bottom: 12px;">Recent</div>
+                        <div class="sidebar-item" style="font-size: 12px;">John Smith - CLM-789456</div>
+                        <div class="sidebar-item" style="font-size: 12px;">Mary Johnson - Benefits</div>
+                    </div>
+                </div>
+                <div class="mockup-chat">
+                    <div class="chat-bubble chat-user">Find member John Smith, DOB 03/15/1965</div>
+                    <div class="chat-bubble chat-agent">
+                        <strong>👤 Member Agent</strong><br><br>
+                        Found: <strong>John Smith</strong><br>
+                        Member ID: MHI-2024-456789<br>
+                        DOB: 03/15/1965 | Age: 60<br>
+                        Plan: Medicare Advantage Plus<br>
+                        Status: <span style="color: var(--mint);">Active</span><br>
+                        PCP: Dr. Martinez, Cardiology<br><br>
+                        Would you like me to check claims, benefits, or pharmacy info?
+                    </div>
+                    <div class="chat-bubble chat-user">What's his most recent denied claim?</div>
+                    <div class="chat-bubble chat-agent">
+                        <strong>🏥 Claims Agent</strong><br><br>
+                        Claim CLM-2024-789456<br>
+                        Status: <span style="color: var(--coral);">Denied</span><br>
+                        Service Date: 01/15/2024<br>
+                        Billed: $2,450.00<br>
+                        Reason: Prior Authorization Required (PA-001)<br><br>
+                        <strong>Next Steps:</strong><br>
+                        1. Submit PA via PEGA UM portal<br>
+                        2. Provider can appeal within 60 days
+                    </div>
+                    <div style="margin-top: auto; padding: 16px; background: var(--slate); border-radius: 12px;">
+                        <span style="font-size: 13px; color: var(--smoke);">Ask me anything about members, claims, benefits, pharmacy...</span>
+                    </div>
+                </div>
+                <div class="mockup-panel">
+                    <div class="panel-title">Active Agents</div>
+                    <div class="panel-item">
+                        <div class="panel-item-label">👤 Member Agent</div>
+                        <div class="panel-item-value" style="color: var(--mint); font-size: 12px;">Completed</div>
+                    </div>
+                    <div class="panel-item">
+                        <div class="panel-item-label">🏥 Claims Agent</div>
+                        <div class="panel-item-value" style="color: var(--mint); font-size: 12px;">Completed</div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <div class="panel-title">Member Context</div>
+                        <div class="panel-item"><div class="panel-item-label">Name</div><div class="panel-item-value">John Smith</div></div>
+                        <div class="panel-item"><div class="panel-item-label">Plan</div><div class="panel-item-value">MA Plus</div></div>
+                        <div class="panel-item"><div class="panel-item-label">OTC Balance</div><div class="panel-item-value" style="color: var(--mint);">$75 remaining</div></div>
+                        <div class="panel-item"><div class="panel-item-label">Rides Left</div><div class="panel-item-value">18 of 24</div></div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <div class="panel-title">Quick Actions</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="padding: 8px 12px; background: var(--mint-glow); border-radius: 8px; font-size: 12px; color: var(--mint); cursor: default;">📋 View Full Benefits</div>
+                            <div style="padding: 8px 12px; background: rgba(0,212,255,0.08); border-radius: 8px; font-size: 12px; color: var(--cyan); cursor: default;">🚗 Schedule Ride</div>
+                            <div style="padding: 8px 12px; background: rgba(255,184,0,0.08); border-radius: 8px; font-size: 12px; color: var(--amber); cursor: default;">📝 Create Case</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ ARCHITECTURE ═══ -->
+    <div class="tab-panel" id="architecture">
+        <h1 class="page-title">Technical <em>Architecture</em></h1>
+        <p class="page-sub">Multi-agent orchestration built on LangGraph with Salesforce integration and Azure AI backbone.</p>
+
+        <div class="card" style="padding: 40px;">
+            <div class="card-header" style="margin-bottom: 24px;">System Architecture</div>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <span style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--smoke); width: 120px; flex-shrink: 0;">Interface</span>
+                    <div class="tags" style="margin: 0;"><span class="tag" style="background: var(--mint-glow); color: var(--mint); border-color: rgba(0,229,160,0.2);">Web Chat UI</span><span class="tag" style="background: var(--mint-glow); color: var(--mint); border-color: rgba(0,229,160,0.2);">MS Teams Bot</span><span class="tag" style="background: var(--mint-glow); color: var(--mint); border-color: rgba(0,229,160,0.2);">Salesforce Lightning</span></div>
+                </div>
+                <div style="height: 1px; background: rgba(255,255,255,0.04);"></div>
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <span style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--smoke); width: 120px; flex-shrink: 0;">Orchestration</span>
+                    <div class="tags" style="margin: 0;"><span class="tag" style="background: rgba(0,212,255,0.08); color: var(--cyan); border-color: rgba(0,212,255,0.2);">LangGraph (Multi-Agent)</span><span class="tag" style="background: rgba(0,212,255,0.08); color: var(--cyan); border-color: rgba(0,212,255,0.2);">Intent Router</span><span class="tag" style="background: rgba(0,212,255,0.08); color: var(--cyan); border-color: rgba(0,212,255,0.2);">Context Manager</span></div>
+                </div>
+                <div style="height: 1px; background: rgba(255,255,255,0.04);"></div>
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <span style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--smoke); width: 120px; flex-shrink: 0;">AI Engine</span>
+                    <div class="tags" style="margin: 0;"><span class="tag" style="background: rgba(255,184,0,0.08); color: var(--amber); border-color: rgba(255,184,0,0.2);">Azure OpenAI GPT-4o</span><span class="tag" style="background: rgba(255,184,0,0.08); color: var(--amber); border-color: rgba(255,184,0,0.2);">Embeddings</span><span class="tag" style="background: rgba(255,184,0,0.08); color: var(--amber); border-color: rgba(255,184,0,0.2);">Azure AI Search</span></div>
+                </div>
+                <div style="height: 1px; background: rgba(255,255,255,0.04);"></div>
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <span style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--smoke); width: 120px; flex-shrink: 0;">Data Layer</span>
+                    <div class="tags" style="margin: 0;"><span class="tag" style="background: rgba(167,139,250,0.08); color: var(--violet); border-color: rgba(167,139,250,0.2);">Salesforce APIs</span><span class="tag" style="background: rgba(167,139,250,0.08); color: var(--violet); border-color: rgba(167,139,250,0.2);">Mulesoft</span><span class="tag" style="background: rgba(167,139,250,0.08); color: var(--violet); border-color: rgba(167,139,250,0.2);">PEGA UM</span><span class="tag" style="background: rgba(167,139,250,0.08); color: var(--violet); border-color: rgba(167,139,250,0.2);">SQL Server</span></div>
+                </div>
+                <div style="height: 1px; background: rgba(255,255,255,0.04);"></div>
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <span style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--smoke); width: 120px; flex-shrink: 0;">Infra</span>
+                    <div class="tags" style="margin: 0;"><span class="tag" style="background: rgba(255,107,107,0.08); color: var(--coral); border-color: rgba(255,107,107,0.2);">Azure Cloud</span><span class="tag" style="background: rgba(255,107,107,0.08); color: var(--coral); border-color: rgba(255,107,107,0.2);">Apigee Gateway</span><span class="tag" style="background: rgba(255,107,107,0.08); color: var(--coral); border-color: rgba(255,107,107,0.2);">FastAPI</span><span class="tag" style="background: rgba(255,107,107,0.08); color: var(--coral); border-color: rgba(255,107,107,0.2);">Python</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ LIVE SOLUTIONS ═══ -->
+    <div class="tab-panel" id="live">
+        <h1 class="page-title">Live <em>Solutions</em></h1>
+        <p class="page-sub">6 AI solutions already deployed and running in production.</p>
+
+        <div class="grid-2">
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header">🔍 Knowledge Job Aid (All LOBs)</div>
+                <p>RAG-powered knowledge search across all lines of business. Agents query procedures, policies, and SOPs in natural language and get context-aware answers with source references.</p>
+                <div class="tags"><span class="tag" style="color: var(--mint);">RAG</span><span class="tag" style="color: var(--mint);">Azure AI Search</span><span class="tag" style="color: var(--mint);">All LOBs</span></div>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header">📋 Benefit Search (EOCs)</div>
+                <p>Natural language search across Evidence of Coverage documents. Members and agents can ask benefit questions and get precise answers with document references.</p>
+                <div class="tags"><span class="tag" style="color: var(--mint);">RAG</span><span class="tag" style="color: var(--mint);">Embeddings</span><span class="tag" style="color: var(--mint);">EOC Docs</span></div>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header">📞 Contact Center Call Summary</div>
+                <p>Auto-generates structured summaries for every call. Extracts caller intent, key topics, action items, and follow-up requirements via LLM + Mulesoft integration.</p>
+                <div class="tags"><span class="tag" style="color: var(--mint);">LLM</span><span class="tag" style="color: var(--mint);">Mulesoft</span><span class="tag" style="color: var(--mint);">Real-time</span></div>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header">✅ Quality Audit Framework</div>
+                <p>AI-powered quality scoring across 17 KPIs with automated compliance checking, health alert verification, and detailed audit reports.</p>
+                <div class="tags"><span class="tag" style="color: var(--mint);">17 KPIs</span><span class="tag" style="color: var(--mint);">Compliance</span><span class="tag" style="color: var(--mint);">Audit</span></div>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header">📠 Fax to Case — PCP Change</div>
+                <p>Automated fax processing using Azure Document Intelligence + GPT-4 Vision. Classifies fax content and creates Salesforce cases automatically.</p>
+                <div class="tags"><span class="tag" style="color: var(--mint);">Doc Intelligence</span><span class="tag" style="color: var(--mint);">GPT-4 Vision</span><span class="tag" style="color: var(--mint);">Automation</span></div>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header">🤖 Agent Assist (Real-Time Co-Pilot)</div>
+                <p>Real-time AI co-pilot for contact center agents. Provides intelligent suggestions, auto-populates responses, and guides through complex workflows.</p>
+                <div class="tags"><span class="tag" style="color: var(--mint);">Real-time</span><span class="tag" style="color: var(--mint);">Co-Pilot</span><span class="tag" style="color: var(--mint);">Salesforce</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ USE CASES ═══ -->
+    <div class="tab-panel" id="usecases">
+        <h1 class="page-title">Use <em>Cases</em></h1>
+        <p class="page-sub">Organized by team — how MedInsight 360 serves every corner of the organization.</p>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">📞 For Support Center Teams</div>
+                <ul class="check-list">
+                    <li><span class="check-icon">✓</span> One-stop member 360° view across all systems</li>
+                    <li><span class="check-icon">✓</span> Instant claims status with denial reasons &amp; next steps</li>
+                    <li><span class="check-icon">✓</span> Real-time benefits lookup with supplemental details</li>
+                    <li><span class="check-icon">✓</span> Pharmacy coverage verification &amp; alternatives</li>
+                    <li><span class="check-icon">✓</span> Transportation scheduling &amp; management</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header">⚙️ For Operations Teams</div>
+                <ul class="check-list">
+                    <li><span class="check-icon">✓</span> Automated claims triage with intelligent routing</li>
+                    <li><span class="check-icon">✓</span> AI-powered appeal routing and tracking</li>
+                    <li><span class="check-icon">✓</span> Fax/voicemail processing automation</li>
+                    <li><span class="check-icon">✓</span> Cost recovery approval recommendations</li>
+                    <li><span class="check-icon">✓</span> Bulk case closure with AI validation</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header">📈 For Risk &amp; Quality Teams</div>
+                <ul class="check-list">
+                    <li><span class="check-icon">✓</span> Centralized Chart360 portal across 10+ systems</li>
+                    <li><span class="check-icon">✓</span> AI-extracted ICD/HCC codes with evidence</li>
+                    <li><span class="check-icon">✓</span> HEDIS measure pre-processing automation</li>
+                    <li><span class="check-icon">✓</span> QA audit with health alert verification</li>
+                    <li><span class="check-icon">✓</span> Risk adjustment metrics and reconciliation</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header">📊 For Leadership</div>
+                <ul class="check-list">
+                    <li><span class="check-icon">✓</span> AI-generated operational reports</li>
+                    <li><span class="check-icon">✓</span> Cross-department performance dashboards</li>
+                    <li><span class="check-icon">✓</span> Automation ROI tracking &amp; projections</li>
+                    <li><span class="check-icon">✓</span> Member satisfaction trend analysis</li>
+                    <li><span class="check-icon">✓</span> Compliance monitoring &amp; alerting</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ ROADMAP ═══ -->
+    <div class="tab-panel" id="roadmap">
+        <h1 class="page-title"><em>Roadmap</em></h1>
+        <p class="page-sub">Delivery timeline for the complete MedInsight 360 platform.</p>
+
+        <div class="card" style="margin-bottom: 24px; border-left: 3px solid var(--mint);">
+            <div class="card-header" style="color: var(--mint);">✅ Foundation (Delivered)</div>
+            <p>Knowledge search, benefits lookup, call summary, quality audit, fax processing, agent assist. Core AI capabilities established and running in production across all LOBs.</p>
+        </div>
+        <div class="card" style="margin-bottom: 24px; border-left: 3px solid var(--cyan);">
+            <div class="card-header" style="color: var(--cyan);">🔄 Agentic Hub (In Progress)</div>
+            <p>Web chat UI with multi-agent orchestration. Member search agent, claims agent, authorization agent, campaign agent. LangGraph-based orchestration with Salesforce API integration.</p>
+        </div>
+        <div class="card" style="margin-bottom: 24px; border-left: 3px solid var(--amber);">
+            <div class="card-header" style="color: var(--amber);">🔜 Full Coverage (Q2-Q3 2026)</div>
+            <p>Complete agent suite: pharmacy, provider network, transportation, grievance. MS Teams integration, advanced analytics dashboard, and self-improving recommendation engine.</p>
+        </div>
+        <div class="card" style="border-left: 3px solid var(--violet);">
+            <div class="card-header" style="color: var(--violet);">🔮 Autonomous Operations (2026+)</div>
+            <p>Predictive member engagement, self-healing workflows, cross-agent learning, automated compliance monitoring, and proactive issue resolution before members even call.</p>
+        </div>
+    </div>
+
+</main>
+
+<footer class="footer">Next-Era AI — MedInsight 360 Agentic Hub | Enterprise AI Solution</footer>
+
+<script>
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+            window.scrollTo({ top: 120, behavior: 'smooth' });
+        });
+    });
+</script>
+</body>
+</html>

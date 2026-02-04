@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEDIS AI Extraction - Internal Solution</title>
+    <style>
+        :root {
+            --primary: #1a73a7;
+            --primary-dark: #145a82;
+            --primary-light: #2d9cdb;
+            --secondary: #00a86b;
+            --accent: #ff6b35;
+            --bg-light: #f5f7fa;
+            --bg-white: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #6c7a89;
+            --border: #e1e8ed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: var(--bg-light);
+        }
+        
+        /* Fixed Top Section */
+        .fixed-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 .highlight {
+            color: #ffd700;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* Tabs Container */
+        .tabs-container {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+            background: var(--bg-light);
+        }
+        
+        .tab.active {
+            color: white;
+            background: var(--primary-light);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-dark);
+        }
+        
+        /* Spacer for fixed header */
+        .header-spacer {
+            height: 180px; /* Adjust based on header + tabs height */
+        }
+        
+        /* Content Area */
+        .content-area {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section Styles */
+        .section-title {
+            font-size: 32px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-light);
+        }
+        
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Diagram Container */
+        .diagram-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        
+        .diagram-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+        
+        /* SVG Styles */
+        .diagram-svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+        
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .grid-3, .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+            .tab { padding: 10px 12px; font-size: 10px; }
+            .header h1 { font-size: 24px; }
+            .header p { font-size: 13px; }
+            .header-spacer { height: 200px; }
+        }
+        
+        /* Feature Cards */
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        
+        .feature-desc {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table th:nth-child(2) {
+            background: var(--danger);
+        }
+        
+        .comparison-table th:nth-child(3) {
+            background: var(--success);
+        }
+        
+        .comparison-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+        
+        .comparison-table tr:hover {
+            background: #f0f7ff;
+        }
+        
+        /* Highlight Boxes */
+        .highlight-box {
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+        
+        .highlight-box.info {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .highlight-box.success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border-left: 5px solid var(--success);
+        }
+        
+        .highlight-box.warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-left: 5px solid var(--warning);
+        }
+        
+        .highlight-box h4 {
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        /* Benefits List */
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .benefits-list li {
+            padding: 18px 25px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--success);
+        }
+        
+        .benefits-list .icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        /* Cost Cards */
+        .cost-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .cost-header {
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        
+        .cost-header.old { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .cost-header.new { background: linear-gradient(135deg, #10b981, #059669); }
+        
+        .cost-header h3 { font-size: 20px; margin-bottom: 5px; }
+        
+        .cost-body { padding: 25px; }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .cost-item:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        /* Sequence Steps */
+        .seq-steps {
+            position: relative;
+        }
+        
+        .seq-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-light);
+        }
+        
+        .seq-num {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+        
+        .seq-content h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .seq-content p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        /* Salesforce Preview */
+        .sf-preview {
+            background: #f3f3f3;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .sf-header {
+            background: #16325c;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        
+        .sf-body {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            min-height: 350px;
+        }
+        
+        .sf-main {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        
+        .sf-toolbar {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .sf-pdf-area {
+            background: #fafafa;
+            border: 1px dashed #ccc;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .sf-sidebar {
+            background: linear-gradient(180deg, #1a9e8f 0%, #158a7d 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .sf-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .sf-tab {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .sf-tab.active {
+            background: white;
+            color: #1a9e8f;
+            font-weight: 600;
+        }
+        
+        .sf-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .sf-stat-num {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .sf-stat-label {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        .sf-qa-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .sf-qa-q {
+            font-size: 12px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .sf-qa-a {
+            font-weight: 700;
+            font-size: 16px;
+            color: #ffd700;
+        }
+        
+        .sf-page-badges {
+            margin-top: 10px;
+        }
+        
+        .sf-page-badge {
+            display: inline-block;
+            background: var(--success);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            margin: 2px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .footer-logo { font-size: 24px; margin-bottom: 10px; }
+        .footer-text { opacity: 0.7; font-size: 14px; }
+        
+        /* Print */
+        @media print {
+            .tabs-container { position: static; }
+            .tab-content { display: block !important; page-break-inside: avoid; }
+            .tab { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fixed Top Section (Header + Tabs) -->
+<div class="fixed-top">
+    <!-- Header -->
+    <header class="header">
+        <h1><span class="highlight">HEDIS</span> AI Extraction <span style="font-size: 20px; opacity: 0.9;">(Internal Solution)</span></h1>
+        <p>Extensible Foundation Platform for Risk & Quality Data Extraction</p>
+    </header>
+
+    <!-- Fixed Tabs -->
+    <nav class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="architecture">Solution Architecture</button>
+            <button class="tab" data-tab="workflow">Processing Workflow</button>
+            <button class="tab" data-tab="salesforce">Salesforce Integration</button>
+            <button class="tab" data-tab="features">Key Features</button>
+            <button class="tab" data-tab="cost">Cost Analysis</button>
+            <button class="tab" data-tab="admin">Admin Console</button>
+            <button class="tab" data-tab="benefits">Benefits</button>
+            <button class="tab" data-tab="extensibility">🔮 Extensibility</button>
+        </div>
+    </nav>
+</div>
+
+<!-- Spacer for fixed header -->
+<div class="header-spacer"></div>
+
+<!-- Content Area -->
+<main class="content-area">
+
+    <!-- Overview Tab -->
+    <div class="tab-content active" id="overview">
+        <h2 class="section-title">Executive Overview</h2>
+        <p class="section-subtitle">Intelligent Medical Chart Processing for HEDIS Quality Measures</p>
+        
+        <div class="highlight-box info">
+            <h4>🎯 Core Philosophy</h4>
+            <p><strong>"Build what is simple, cost-efficient, high-value, and measurable — and ensure it remains sustainable."</strong></p>
+        </div>
+        
+        <!-- Feasibility → Reliability → Acceptance -->
+        <div class="card" style="margin-bottom: 30px; border-left: 4px solid var(--primary);">
+            <div class="card-title" style="margin-bottom: 20px;">🎯 Approach for this Solution</div>
+            <div style="text-align: center; margin-bottom: 25px;">
+                <span style="font-size: 18px; font-weight: 700; color: var(--primary);">Feasibility</span>
+                <span style="font-size: 24px; margin: 0 15px; color: var(--text-light);">→</span>
+                <span style="font-size: 18px; font-weight: 700; color: var(--secondary);">Reliability</span>
+                <span style="font-size: 24px; margin: 0 15px; color: var(--text-light);">→</span>
+                <span style="font-size: 18px; font-weight: 700; color: var(--accent);">Acceptance</span>
+            </div>
+            <div class="grid-3" style="gap: 20px;">
+                <div style="padding: 20px; background: #f0f7ff; border-radius: 10px; border-top: 3px solid var(--primary);">
+                    <div style="font-size: 28px; margin-bottom: 10px;">✅</div>
+                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 8px;">Feasibility</div>
+                    <div style="font-size: 13px; color: var(--text-light); line-height: 1.6;">Ensure the solution is viable using technology we have now (and will have shortly), confirming it can realistically meet business needs without over-engineering.</div>
+                </div>
+                <div style="padding: 20px; background: #f0fdf4; border-radius: 10px; border-top: 3px solid var(--secondary);">
+                    <div style="font-size: 28px; margin-bottom: 10px;">🔒</div>
+                    <div style="font-weight: 600; color: var(--secondary); margin-bottom: 8px;">Reliability</div>
+                    <div style="font-size: 13px; color: var(--text-light); line-height: 1.6;">Validate that the solution is stable, scalable, secure, and sustainable for at least two years of production use with minimal operational overhead.</div>
+                </div>
+                <div style="padding: 20px; background: #fff7ed; border-radius: 10px; border-top: 3px solid var(--accent);">
+                    <div style="font-size: 28px; margin-bottom: 10px;">🤝</div>
+                    <div style="font-weight: 600; color: var(--accent); margin-bottom: 8px;">Acceptance</div>
+                    <div style="font-size: 13px; color: var(--text-light); line-height: 1.6;">Confirm business is fully aligned with deliverables, committed to adoption, and genuinely eager to use the solution in day-to-day operations.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid-5">
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <div class="feature-title">Plugin Architecture</div>
+                <div class="feature-desc">Add, remove, or modify measures with minimal changes. Highly configurable through JSON files.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">Cost Efficient</div>
+                <div class="feature-desc">Uses existing Azure OpenAI model. No per-page OCR costs. Fixed monthly pricing.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Full Control</div>
+                <div class="feature-desc">Complete code ownership. Admin console for monitoring, configuration, and real-time visibility.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <div class="feature-title">Scalable</div>
+                <div class="feature-desc">Runs on existing Pursuit VMs. Can scale to multiple servers based on load.</div>
+            </div>
+            <div class="feature-card" style="border-top: 3px solid #f59e0b;">
+                <div class="feature-icon">🔮</div>
+                <div class="feature-title">Extensible</div>
+                <div class="feature-desc">Foundation platform ready for Risk Adjustment, Quality Programs, and more.</div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-title">📊 Solution Highlights</div>
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: var(--success); margin-bottom: 15px;">✅ What This Solution Provides</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0;">• Automated extraction of HEDIS measure data</li>
+                        <li style="padding: 8px 0;">• Precise coordinate-based highlighting</li>
+                        <li style="padding: 8px 0;">• AI-powered Q&A with clinical reasoning</li>
+                        <li style="padding: 8px 0;">• Source page references for verification</li>
+                        <li style="padding: 8px 0;">• Real-time admin monitoring dashboard</li>
+                        <li style="padding: 8px 0;">• Seamless Salesforce integration</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">🏥 Supported Measures (21)</h4>
+                    <p style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">
+                        <strong style="color: var(--success);">✅ 16 of 21 completed</strong> — These 21 measures cover <strong>98% of chart volume</strong> per business requirements.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ BPD</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ CBP</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ COL</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ COA</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ CCS</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ IMA</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ LSC</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ EED</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ GSD</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ PPC</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ DEV</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ OMW</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ BCS</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ W30</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ CHL</span>
+                        <span style="background: #d1fae5; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #065f46;">✓ WCV</span>
+                        <span style="background: #fef3c7; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #92400e;">⏳ WCC</span>
+                        <span style="background: #fef3c7; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #92400e;">⏳ CIS</span>
+                        <span style="background: #fef3c7; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #92400e;">⏳ SPD</span>
+                        <span style="background: #fef3c7; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #92400e;">⏳ SPC</span>
+                        <span style="background: #fef3c7; padding: 6px 12px; border-radius: 15px; font-size: 12px; color: #92400e;">⏳ TRC</span>
+                    </div>
+                    <h4 style="color: var(--text-light); margin-bottom: 8px; font-size: 13px;">⛔ Not in Scope (16 measures — minimal volume)</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">FUI</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">FMC</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">AMR</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">FUM</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">HBD</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">ACP</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">ADD</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">FUH</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">APM</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">AAP</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">FUA</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">CWP</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">CDC</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">DSF</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">EDV</span>
+                        <span style="background: #fee2e2; padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #991b1b;">KED</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture Tab -->
+    <div class="tab-content" id="architecture">
+        <h2 class="section-title">Solution Architecture & Implementation</h2>
+        <p class="section-subtitle">Modular, loosely-coupled design for maximum flexibility</p>
+        
+        <!-- High-Level Architecture Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-title">High-Level System Architecture</div>
+            <svg class="diagram-svg" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <defs>
+                    <linearGradient id="sfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00a1e0"/>
+                        <stop offset="100%" style="stop-color:#0076b5"/>
+                    </linearGradient>
+                    <linearGradient id="azureGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0089d6"/>
+                        <stop offset="100%" style="stop-color:#0063a6"/>
+                    </linearGradient>
+                    <linearGradient id="pythonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3776ab"/>
+                        <stop offset="100%" style="stop-color:#2d6a9f"/>
+                    </linearGradient>
+                    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#cc2927"/>
+                        <stop offset="100%" style="stop-color:#a02725"/>
+                    </linearGradient>
+                    <linearGradient id="adminGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00d4ff"/>
+                        <stop offset="100%" style="stop-color:#0099cc"/>
+                    </linearGradient>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+                    </filter>
+                </defs>
+                
+                <!-- Layer Labels -->
+                <text x="50" y="80" font-size="14" font-weight="600" fill="#6c7a89">PRESENTATION</text>
+                <text x="50" y="220" font-size="14" font-weight="600" fill="#6c7a89">PROCESSING</text>
+                <text x="50" y="380" font-size="14" font-weight="600" fill="#6c7a89">DATA LAYER</text>
+                <text x="50" y="520" font-size="14" font-weight="600" fill="#6c7a89">INFRASTRUCTURE</text>
+                
+                <!-- Presentation Layer -->
+                <rect x="180" y="50" width="200" height="70" rx="10" fill="url(#sfGrad)" filter="url(#shadow)"/>
+                <text x="280" y="80" font-size="14" font-weight="600" fill="white" text-anchor="middle">Salesforce UI</text>
+                <text x="280" y="100" font-size="11" fill="white" text-anchor="middle" opacity="0.9">Chart Workflow & AI Sidebar</text>
+                
+                <rect x="420" y="50" width="200" height="70" rx="10" fill="url(#adminGrad)" filter="url(#shadow)"/>
+                <text x="520" y="80" font-size="14" font-weight="600" fill="white" text-anchor="middle">Admin Console</text>
+                <text x="520" y="100" font-size="11" fill="white" text-anchor="middle" opacity="0.9">Monitoring & Configuration</text>
+                
+                <!-- Arrows down -->
+                <path d="M280 120 L280 160 M275 155 L280 165 L285 155" stroke="#1a73a7" stroke-width="2" fill="none"/>
+                <path d="M520 120 L520 160 M515 155 L520 165 L525 155" stroke="#1a73a7" stroke-width="2" fill="none"/>
+                
+                <!-- Processing Layer -->
+                <rect x="150" y="180" width="180" height="70" rx="10" fill="url(#pythonGrad)" filter="url(#shadow)"/>
+                <text x="240" y="210" font-size="14" font-weight="600" fill="white" text-anchor="middle">HEDIS Processor</text>
+                <text x="240" y="230" font-size="11" fill="white" text-anchor="middle" opacity="0.9">Python Multi-threaded</text>
+                
+                <rect x="360" y="180" width="180" height="70" rx="10" fill="url(#pythonGrad)" filter="url(#shadow)"/>
+                <text x="450" y="210" font-size="14" font-weight="600" fill="white" text-anchor="middle">Measure Processors</text>
+                <text x="450" y="230" font-size="11" fill="white" text-anchor="middle" opacity="0.9">BPD, CBP, COL, WCC...</text>
+                
+                <rect x="570" y="180" width="180" height="70" rx="10" fill="url(#pythonGrad)" filter="url(#shadow)"/>
+                <text x="660" y="210" font-size="14" font-weight="600" fill="white" text-anchor="middle">LLM Client</text>
+                <text x="660" y="230" font-size="11" fill="white" text-anchor="middle" opacity="0.9">Azure OpenAI Integration</text>
+                
+                <!-- Connecting lines in processing -->
+                <path d="M330 215 L360 215" stroke="#1a73a7" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                <path d="M540 215 L570 215" stroke="#1a73a7" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                
+                <!-- Arrows down -->
+                <path d="M400 250 L400 320 M395 315 L400 325 L405 315" stroke="#1a73a7" stroke-width="2" fill="none"/>
+                
+                <!-- Data Layer -->
+                <rect x="200" y="340" width="200" height="70" rx="10" fill="url(#dbGrad)" filter="url(#shadow)"/>
+                <text x="300" y="370" font-size="14" font-weight="600" fill="white" text-anchor="middle">SQL Server</text>
+                <text x="300" y="390" font-size="11" fill="white" text-anchor="middle" opacity="0.9">CHART.MASTER & AI2_EXTRACTION</text>
+                
+                <rect x="440" y="340" width="200" height="70" rx="10" fill="url(#azureGrad)" filter="url(#shadow)"/>
+                <text x="540" y="370" font-size="14" font-weight="600" fill="white" text-anchor="middle">Azure Blob Storage</text>
+                <text x="540" y="390" font-size="11" fill="white" text-anchor="middle" opacity="0.9">PDFs & JSON Outputs</text>
+                
+                <!-- Arrows down -->
+                <path d="M400 410 L400 460 M395 455 L400 465 L405 455" stroke="#1a73a7" stroke-width="2" fill="none"/>
+                
+                <!-- Infrastructure Layer -->
+                <rect x="200" y="480" width="200" height="70" rx="10" fill="#6b7280" filter="url(#shadow)"/>
+                <text x="300" y="510" font-size="14" font-weight="600" fill="white" text-anchor="middle">Pursuit VMs</text>
+                <text x="300" y="530" font-size="11" fill="white" text-anchor="middle" opacity="0.9">Existing Infrastructure</text>
+                
+                <rect x="440" y="480" width="200" height="70" rx="10" fill="url(#azureGrad)" filter="url(#shadow)"/>
+                <text x="540" y="510" font-size="14" font-weight="600" fill="white" text-anchor="middle">Azure OpenAI</text>
+                <text x="540" y="530" font-size="11" fill="white" text-anchor="middle" opacity="0.9">GPT-4o-mini Model</text>
+                
+                <!-- Side connection to OpenAI -->
+                <path d="M660 250 L750 250 L750 515 L640 515" stroke="#1a73a7" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                <polygon points="645,510 635,515 645,520" fill="#1a73a7"/>
+            </svg>
+        </div>
+        
+        <!-- Module Architecture Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-title">Plugin Module Architecture</div>
+            <svg class="diagram-svg" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- Config Box -->
+                <rect x="50" y="100" width="180" height="100" rx="10" fill="#f0f9ff" stroke="#1a73a7" stroke-width="2"/>
+                <text x="140" y="135" font-size="14" font-weight="600" fill="#1a73a7" text-anchor="middle">📄 config/measures/</text>
+                <text x="140" y="160" font-size="12" fill="#6c7a89" text-anchor="middle">JSON Configuration</text>
+                <text x="140" y="180" font-size="11" fill="#6c7a89" text-anchor="middle">COL.json, BPD.json...</text>
+                
+                <!-- Arrow -->
+                <path d="M230 150 L280 150" stroke="#1a73a7" stroke-width="3" fill="none"/>
+                <polygon points="280,145 295,150 280,155" fill="#1a73a7"/>
+                
+                <!-- Factory Box -->
+                <rect x="300" y="100" width="180" height="100" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="390" y="135" font-size="14" font-weight="600" fill="#92400e" text-anchor="middle">⚙️ Processor Factory</text>
+                <text x="390" y="160" font-size="12" fill="#6c7a89" text-anchor="middle">Dynamic Selection</text>
+                <text x="390" y="180" font-size="11" fill="#6c7a89" text-anchor="middle">Routes to correct processor</text>
+                
+                <!-- Arrow -->
+                <path d="M480 150 L530 150" stroke="#1a73a7" stroke-width="3" fill="none"/>
+                <polygon points="530,145 545,150 530,155" fill="#1a73a7"/>
+                
+                <!-- Processor Box -->
+                <rect x="550" y="100" width="180" height="100" rx="10" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+                <text x="640" y="135" font-size="14" font-weight="600" fill="#065f46" text-anchor="middle">🔬 Measure Processor</text>
+                <text x="640" y="160" font-size="12" fill="#6c7a89" text-anchor="middle">Extraction & Highlighting</text>
+                <text x="640" y="180" font-size="11" fill="#6c7a89" text-anchor="middle">COL, BPD, WCC processors</text>
+                
+                <!-- Arrow -->
+                <path d="M730 150 L780 150" stroke="#1a73a7" stroke-width="3" fill="none"/>
+                <polygon points="780,145 795,150 780,155" fill="#1a73a7"/>
+                
+                <!-- Output Box -->
+                <rect x="800" y="100" width="150" height="100" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+                <text x="875" y="135" font-size="14" font-weight="600" fill="#5b21b6" text-anchor="middle">📊 JSON Output</text>
+                <text x="875" y="160" font-size="12" fill="#6c7a89" text-anchor="middle">Highlights & Q&A</text>
+                <text x="875" y="180" font-size="11" fill="#6c7a89" text-anchor="middle">→ Azure Blob</text>
+            </svg>
+        </div>
+        
+        <div class="highlight-box success">
+            <h4>🔌 True Plugin Architecture</h4>
+            <p>New measures can be added by simply creating a JSON configuration file and a processor class. No changes to the core engine are required. The factory pattern automatically routes processing based on measure type.</p>
+        </div>
+    </div>
+
+    <!-- Workflow Tab -->
+    <div class="tab-content" id="workflow">
+        <h2 class="section-title">Processing Workflow</h2>
+        <p class="section-subtitle">End-to-end chart processing pipeline</p>
+        
+        <!-- Sequence Flow Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-title">Processing Sequence Flow</div>
+            <svg class="diagram-svg" viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg">
+                <!-- Actor Headers -->
+                <rect x="50" y="30" width="120" height="40" rx="5" fill="#1a73a7"/>
+                <text x="110" y="55" font-size="12" font-weight="600" fill="white" text-anchor="middle">Chart Master</text>
+                
+                <rect x="230" y="30" width="120" height="40" rx="5" fill="#1a73a7"/>
+                <text x="290" y="55" font-size="12" font-weight="600" fill="white" text-anchor="middle">Processor</text>
+                
+                <rect x="410" y="30" width="120" height="40" rx="5" fill="#1a73a7"/>
+                <text x="470" y="55" font-size="12" font-weight="600" fill="white" text-anchor="middle">Azure Blob</text>
+                
+                <rect x="590" y="30" width="120" height="40" rx="5" fill="#1a73a7"/>
+                <text x="650" y="55" font-size="12" font-weight="600" fill="white" text-anchor="middle">Azure OpenAI</text>
+                
+                <rect x="770" y="30" width="120" height="40" rx="5" fill="#1a73a7"/>
+                <text x="830" y="55" font-size="12" font-weight="600" fill="white" text-anchor="middle">Database</text>
+                
+                <rect x="950" y="30" width="120" height="40" rx="5" fill="#1a73a7"/>
+                <text x="1010" y="55" font-size="12" font-weight="600" fill="white" text-anchor="middle">Salesforce</text>
+                
+                <!-- Lifelines -->
+                <line x1="110" y1="70" x2="110" y2="680" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+                <line x1="290" y1="70" x2="290" y2="680" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+                <line x1="470" y1="70" x2="470" y2="680" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+                <line x1="650" y1="70" x2="650" y2="680" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+                <line x1="830" y1="70" x2="830" y2="680" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+                <line x1="1010" y1="70" x2="1010" y2="680" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+                
+                <!-- Step 1 -->
+                <line x1="110" y1="110" x2="290" y2="110" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="285,105 295,110 285,115" fill="#1a73a7"/>
+                <text x="200" y="100" font-size="11" fill="#333" text-anchor="middle">1. Queue new charts</text>
+                
+                <!-- Step 2 -->
+                <line x1="290" y1="150" x2="830" y2="150" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="825,145 835,150 825,155" fill="#1a73a7"/>
+                <text x="560" y="140" font-size="11" fill="#333" text-anchor="middle">2. Claim records (READY → INPROGRESS)</text>
+                
+                <!-- Step 3 -->
+                <line x1="290" y1="200" x2="470" y2="200" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="465,195 475,200 465,205" fill="#1a73a7"/>
+                <text x="380" y="190" font-size="11" fill="#333" text-anchor="middle">3. Download PDF</text>
+                
+                <!-- Step 4 return -->
+                <line x1="470" y1="240" x2="290" y2="240" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3"/>
+                <polygon points="295,235 285,240 295,245" fill="#10b981"/>
+                <text x="380" y="230" font-size="11" fill="#10b981" text-anchor="middle">4. PDF content</text>
+                
+                <!-- Step 5 -->
+                <rect x="260" y="270" width="60" height="30" fill="#fef3c7" stroke="#f59e0b"/>
+                <text x="290" y="290" font-size="10" fill="#92400e" text-anchor="middle">OCR Check</text>
+                
+                <!-- Step 6 -->
+                <line x1="290" y1="320" x2="650" y2="320" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="645,315 655,320 645,325" fill="#1a73a7"/>
+                <text x="470" y="310" font-size="11" fill="#333" text-anchor="middle">5. Send pages for extraction</text>
+                
+                <!-- Step 7 return -->
+                <line x1="650" y1="370" x2="290" y2="370" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3"/>
+                <polygon points="295,365 285,370 295,375" fill="#10b981"/>
+                <text x="470" y="360" font-size="11" fill="#10b981" text-anchor="middle">6. Keywords, Q&A, coordinates</text>
+                
+                <!-- Step 8 -->
+                <rect x="260" y="400" width="60" height="30" fill="#d1fae5" stroke="#10b981"/>
+                <text x="290" y="420" font-size="10" fill="#065f46" text-anchor="middle">Build JSON</text>
+                
+                <!-- Step 9 -->
+                <line x1="290" y1="450" x2="470" y2="450" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="465,445 475,450 465,455" fill="#1a73a7"/>
+                <text x="380" y="440" font-size="11" fill="#333" text-anchor="middle">7. Upload JSONs</text>
+                
+                <!-- Step 10 return -->
+                <line x1="470" y1="490" x2="290" y2="490" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3"/>
+                <polygon points="295,485 285,490 295,495" fill="#10b981"/>
+                <text x="380" y="480" font-size="11" fill="#10b981" text-anchor="middle">8. Blob URLs</text>
+                
+                <!-- Step 11 -->
+                <line x1="290" y1="530" x2="830" y2="530" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="825,525 835,530 825,535" fill="#1a73a7"/>
+                <text x="560" y="520" font-size="11" fill="#333" text-anchor="middle">9. Update URLs, status → COMPLETE</text>
+                
+                <!-- Step 12 -->
+                <line x1="290" y1="580" x2="1010" y2="580" stroke="#1a73a7" stroke-width="2"/>
+                <polygon points="1005,575 1015,580 1005,585" fill="#1a73a7"/>
+                <text x="650" y="570" font-size="11" fill="#333" text-anchor="middle">10. Update Chart object with AI URLs</text>
+                
+                <!-- Step 13 -->
+                <line x1="1010" y1="630" x2="290" y2="630" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3"/>
+                <polygon points="295,625 285,630 295,635" fill="#10b981"/>
+                <text x="650" y="650" font-size="11" fill="#10b981" text-anchor="middle">11. UI displays AI sidebar with highlights & Q&A</text>
+            </svg>
+        </div>
+        
+        <h3 style="margin: 30px 0 20px;">Detailed Processing Steps</h3>
+        
+        <div class="seq-steps">
+            <div class="seq-step">
+                <div class="seq-num">1</div>
+                <div class="seq-content">
+                    <h4>Chart Ingestion</h4>
+                    <p>Charts are uploaded to CHART.MASTER table with Blob URL and measure type identifier</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">2</div>
+                <div class="seq-content">
+                    <h4>Queue Management</h4>
+                    <p>Processor queues new charts to AI2_EXTRACTION table with READY status</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">3</div>
+                <div class="seq-content">
+                    <h4>Worker Claim</h4>
+                    <p>Multi-threaded workers claim records, update status to INPROGRESS with worker ID</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">4</div>
+                <div class="seq-content">
+                    <h4>PDF Download & OCR Verification</h4>
+                    <p>Download PDF from Azure Blob, verify extractable text using Tesseract (open source OCR)</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">5</div>
+                <div class="seq-content">
+                    <h4>Measure Detection & Processing</h4>
+                    <p>Factory pattern routes to correct measure processor (COL, BPD, WCC, etc.)</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">6</div>
+                <div class="seq-content">
+                    <h4>AI Extraction</h4>
+                    <p>Azure OpenAI (GPT-4o-mini) extracts keywords, answers questions, identifies coordinates</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">7</div>
+                <div class="seq-content">
+                    <h4>JSON Generation & Upload</h4>
+                    <p>Create highlights.json, summary.json, qa.json and upload to Azure Blob container</p>
+                </div>
+            </div>
+            <div class="seq-step">
+                <div class="seq-num">8</div>
+                <div class="seq-content">
+                    <h4>Database & Salesforce Update</h4>
+                    <p>Update AI2_EXTRACTION with URLs, mark COMPLETE, update Salesforce Chart object</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Salesforce Tab -->
+    <div class="tab-content" id="salesforce">
+        <h2 class="section-title">Salesforce Integration</h2>
+        <p class="section-subtitle">Seamless integration with existing Chart Workflow</p>
+        
+        <div class="sf-preview">
+            <div class="sf-header">
+                <span style="font-size: 20px;">☁️</span>
+                Salesforce - Chart Review Workflow
+            </div>
+            <div class="sf-body">
+                <div class="sf-main">
+                    <div class="sf-toolbar">
+                        <span>View</span>
+                        <span>Annotate</span>
+                        <span>Redact</span>
+                        <span>Insert</span>
+                        <span style="margin-left: auto; color: #999;">Page 57/144</span>
+                    </div>
+                    <div class="sf-pdf-area">
+                        <div style="text-align: center; color: #999;">
+                            <div style="font-size: 60px; margin-bottom: 15px;">📄</div>
+                            <div style="font-size: 16px; font-weight: 500;">Medical Chart PDF Viewer</div>
+                            <div style="font-size: 13px; margin-top: 5px;">Click page badges in sidebar to navigate →</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sf-sidebar">
+                    <div class="sf-tabs">
+                        <div class="sf-tab">Clinical Highlights</div>
+                        <div class="sf-tab active">Q&A Analysis</div>
+                    </div>
+                    <div class="sf-stats">
+                        <div>
+                            <div class="sf-stat-num">9</div>
+                            <div class="sf-stat-label">QUESTIONS</div>
+                        </div>
+                        <div>
+                            <div class="sf-stat-num">9</div>
+                            <div class="sf-stat-label">ANSWERED</div>
+                        </div>
+                        <div>
+                            <div class="sf-stat-num">100%</div>
+                            <div class="sf-stat-label">CONFIDENCE</div>
+                        </div>
+                    </div>
+                    <div class="sf-qa-item">
+                        <div class="sf-qa-q">1. Does the patient's DOB range between 2007-2021?</div>
+                        <div class="sf-qa-a">Yes</div>
+                        <div class="sf-page-badges">
+                            <span class="sf-page-badge">Page 1</span>
+                            <span class="sf-page-badge">Page 2</span>
+                            <span class="sf-page-badge">Page 3</span>
+                        </div>
+                    </div>
+                    <div class="sf-qa-item">
+                        <div class="sf-qa-q">2. What date was the height, weight and BMI documented?</div>
+                        <div class="sf-qa-a">04/01/2024</div>
+                        <div class="sf-page-badges">
+                            <span class="sf-page-badge">Page 1</span>
+                        </div>
+                    </div>
+                    <div class="sf-qa-item">
+                        <div class="sf-qa-q">3. Was the member enrolled in hospice?</div>
+                        <div class="sf-qa-a">No</div>
+                        <div class="sf-page-badges">
+                            <span class="sf-page-badge">Page 5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="margin: 40px 0 20px;">Sidebar Features</h3>
+        
+        <div class="grid-2">
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">Clinical Highlights Tab</div>
+                <div class="feature-desc">
+                    Shows patient information (name, DOB, member ID), clinical measures, and searchable keywords. Each keyword displays source pages with clickable badges for instant navigation.
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">❓</div>
+                <div class="feature-title">Q&A Analysis Tab</div>
+                <div class="feature-desc">
+                    Displays measure-specific inclusion and exclusion questions with AI-generated answers. Includes clinical reasoning explanation and source page references.
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <div class="feature-title">One-Click Navigation</div>
+                <div class="feature-desc">
+                    Click any page badge to instantly navigate to that page in the PDF viewer. Highlighted text is automatically scrolled into view.
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Precise Highlighting</div>
+                <div class="feature-desc">
+                    Coordinate-based highlighting pinpoints exact text locations. No over-highlighting or irrelevant matches like the previous solution.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Tab -->
+    <div class="tab-content" id="features">
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-subtitle">What makes this solution powerful</p>
+        
+        <div class="grid-3">
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <div class="feature-title">Plugin Architecture</div>
+                <div class="feature-desc">Add new measures by creating a JSON config file and processor class. No changes to core engine required. True plug-and-play design.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <div class="feature-title">JSON Configuration</div>
+                <div class="feature-desc">All measure settings in JSON files: keywords, variations, Q&A questions. Non-developers can modify configurations.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Multi-threaded Processing</div>
+                <div class="feature-desc">Configurable worker threads (default: 12) for parallel processing. Connection pooling and retry logic for reliability.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Real-time Monitoring</div>
+                <div class="feature-desc">Admin console with live dashboards, processing statistics, error tracking, and performance metrics.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <div class="feature-title">Deadlock Handling</div>
+                <div class="feature-desc">Automatic retry logic for database deadlocks. Stuck record detection and recovery mechanisms.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">Scalable Design</div>
+                <div class="feature-desc">Deploy to multiple servers for increased throughput. Each server can run independently with shared database queue.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌙</div>
+                <div class="feature-title">Off-Peak Processing</div>
+                <div class="feature-desc">Schedule processing during nights and weekends to maximize value from fixed-cost Azure OpenAI subscription.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Easy Maintenance</div>
+                <div class="feature-desc">Full code ownership means bugs can be fixed immediately. No vendor dependency or support tickets required.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Can Be Unplugged</div>
+                <div class="feature-desc">Solution integrates without dependencies. Can be disabled anytime without affecting core operations.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cost Tab -->
+    <div class="tab-content" id="cost">
+        <h2 class="section-title">Cost Analysis</h2>
+        <p class="section-subtitle">Significant cost savings with predictable pricing</p>
+        
+        <!-- Cost Comparison -->
+        <div class="grid-2">
+            <div class="cost-card">
+                <div class="cost-header old">
+                    <h3>❌ Traditional OCR Solution</h3>
+                    <p>Variable, Unpredictable Costs</p>
+                </div>
+                <div class="cost-body">
+                    <div class="cost-item">
+                        <span>Document Intelligence OCR</span>
+                        <span style="color: var(--danger);">Per-page charges</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>AI Processing</span>
+                        <span style="color: var(--danger);">Additional fees</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Vendor Support</span>
+                        <span style="color: var(--danger);">Dependency cost</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Budget Visibility</span>
+                        <span style="color: var(--danger);">None</span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>Total Cost</strong></span>
+                        <span style="color: var(--danger);"><strong>Variable $$$</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cost-card">
+                <div class="cost-header new">
+                    <h3>✅ Current Solution</h3>
+                    <p>Fixed, Predictable Costs</p>
+                </div>
+                <div class="cost-body">
+                    <div class="cost-item">
+                        <span>OCR (Tesseract)</span>
+                        <span style="color: var(--success);">$0 (Open Source)</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Azure OpenAI (GPT-4o-mini)</span>
+                        <span style="color: var(--success);">Existing subscription</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Infrastructure</span>
+                        <span style="color: var(--success);">$0 (Existing VMs)</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Off-Peak Processing</span>
+                        <span style="color: var(--success);">Nights & Weekends</span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>300K Charts Est.</strong></span>
+                        <span style="color: var(--success);"><strong>~$15K</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 2025 HEDIS Volume Stats -->
+        <div class="highlight-box info" style="margin-top: 30px; margin-bottom: 30px;">
+            <h4>📊 2025 HEDIS Volume Analysis</h4>
+            <div class="grid-3" style="margin-top: 20px; text-align: center;">
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--primary);">300K</div>
+                    <div style="font-size: 13px; color: var(--text-light);">Total Charts</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--primary);">237K</div>
+                    <div style="font-size: 13px; color: var(--text-light);">Charts &lt;50 Pages</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--secondary);">~$15K</div>
+                    <div style="font-size: 13px; color: var(--text-light);">Estimated Total Cost</div>
+                </div>
+            </div>
+            <p style="margin-top: 20px; font-size: 13px; color: var(--text-dark); text-align: center; font-style: italic;">
+                💡 <strong>2025 HEDIS (300K charts) estimate ~$15K</strong> — Using GPT-4o-mini during underutilized hours to reduce costs even further.
+            </p>
+        </div>
+        
+        <!-- Page Distribution Table -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-title">📈 Chart Volume by Page Range (2025 HEDIS)</div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr style="background: var(--primary); color: white;">
+                        <th style="padding: 12px; text-align: left;">Page Range</th>
+                        <th style="padding: 12px; text-align: right;">Jan</th>
+                        <th style="padding: 12px; text-align: right;">Feb</th>
+                        <th style="padding: 12px; text-align: right;">Mar</th>
+                        <th style="padding: 12px; text-align: right;">Apr</th>
+                        <th style="padding: 12px; text-align: right;">May</th>
+                        <th style="padding: 12px; text-align: right;">Jun</th>
+                        <th style="padding: 12px; text-align: right;">Jul</th>
+                        <th style="padding: 12px; text-align: right;">Aug</th>
+                        <th style="padding: 12px; text-align: right; background: var(--secondary);">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 10px; font-weight: 600;">1 to 10</td>
+                        <td style="padding: 10px; text-align: right;">8,773</td>
+                        <td style="padding: 10px; text-align: right;">22,891</td>
+                        <td style="padding: 10px; text-align: right;">25,287</td>
+                        <td style="padding: 10px; text-align: right;">16,925</td>
+                        <td style="padding: 10px; text-align: right;">4,407</td>
+                        <td style="padding: 10px; text-align: right;">2,481</td>
+                        <td style="padding: 10px; text-align: right;">17,168</td>
+                        <td style="padding: 10px; text-align: right;">814</td>
+                        <td style="padding: 10px; text-align: right; font-weight: 700; color: var(--success);">98,746</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 10px; font-weight: 600;">11 to 20</td>
+                        <td style="padding: 10px; text-align: right;">3,401</td>
+                        <td style="padding: 10px; text-align: right;">14,270</td>
+                        <td style="padding: 10px; text-align: right;">16,071</td>
+                        <td style="padding: 10px; text-align: right;">11,769</td>
+                        <td style="padding: 10px; text-align: right;">2,934</td>
+                        <td style="padding: 10px; text-align: right;">1,499</td>
+                        <td style="padding: 10px; text-align: right;">9,694</td>
+                        <td style="padding: 10px; text-align: right;">574</td>
+                        <td style="padding: 10px; text-align: right; font-weight: 700; color: var(--success);">60,212</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 10px; font-weight: 600;">21 to 30</td>
+                        <td style="padding: 10px; text-align: right;">1,869</td>
+                        <td style="padding: 10px; text-align: right;">7,356</td>
+                        <td style="padding: 10px; text-align: right;">10,163</td>
+                        <td style="padding: 10px; text-align: right;">7,623</td>
+                        <td style="padding: 10px; text-align: right;">2,063</td>
+                        <td style="padding: 10px; text-align: right;">437</td>
+                        <td style="padding: 10px; text-align: right;">5,571</td>
+                        <td style="padding: 10px; text-align: right;">463</td>
+                        <td style="padding: 10px; text-align: right; font-weight: 700; color: var(--success);">35,545</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 10px; font-weight: 600;">31 to 40</td>
+                        <td style="padding: 10px; text-align: right;">1,161</td>
+                        <td style="padding: 10px; text-align: right;">4,598</td>
+                        <td style="padding: 10px; text-align: right;">6,831</td>
+                        <td style="padding: 10px; text-align: right;">5,282</td>
+                        <td style="padding: 10px; text-align: right;">1,541</td>
+                        <td style="padding: 10px; text-align: right;">293</td>
+                        <td style="padding: 10px; text-align: right;">4,135</td>
+                        <td style="padding: 10px; text-align: right;">317</td>
+                        <td style="padding: 10px; text-align: right; font-weight: 700; color: var(--success);">24,158</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 10px; font-weight: 600;">41 to 50</td>
+                        <td style="padding: 10px; text-align: right;">897</td>
+                        <td style="padding: 10px; text-align: right;">3,475</td>
+                        <td style="padding: 10px; text-align: right;">4,950</td>
+                        <td style="padding: 10px; text-align: right;">4,117</td>
+                        <td style="padding: 10px; text-align: right;">1,233</td>
+                        <td style="padding: 10px; text-align: right;">209</td>
+                        <td style="padding: 10px; text-align: right;">3,225</td>
+                        <td style="padding: 10px; text-align: right;">277</td>
+                        <td style="padding: 10px; text-align: right; font-weight: 700; color: var(--success);">18,383</td>
+                    </tr>
+                    <tr style="background: var(--primary); color: white;">
+                        <td style="padding: 12px; font-weight: 700;" colspan="9">Total Charts (&lt;50 pages) — AI Eligible</td>
+                        <td style="padding: 12px; text-align: right; font-weight: 700; font-size: 18px;">237,044</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Admin Tab -->
+    <div class="tab-content" id="admin">
+        <h2 class="section-title">Admin Console</h2>
+        <p class="section-subtitle">Complete visibility and control for MAS team</p>
+        
+        <div class="highlight-box success" style="text-align: center; padding: 20px; margin-bottom: 25px;">
+            <a href="http://dc10spupsawpw06/" target="_blank" style="font-size: 18px; font-weight: 600; color: #065f46; text-decoration: none;">
+                🚀 Launch Admin Console → http://dc10spupsawpw06/
+            </a>
+        </div>
+        
+        <div class="grid-3">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Live Dashboard</div>
+                <div class="feature-desc">Real-time statistics: queue depth, processing rates, error counts, hourly charts, and per-measure breakdown.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">Live Logs</div>
+                <div class="feature-desc">Stream logs in real-time with filtering by level. Search, download, and analyze processing activity.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <div class="feature-title">Configuration Editor</div>
+                <div class="feature-desc">Modify processing settings, worker count, timeouts, and connection parameters without code changes.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <div class="feature-title">Measure Editor</div>
+                <div class="feature-desc">Add/edit keywords and Q&A questions for each measure. Visual editor with JSON backup.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Service Control</div>
+                <div class="feature-desc">Start, stop, and restart the processor service. View service status and Python processes.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🗃️</div>
+                <div class="feature-title">Database Operations</div>
+                <div class="feature-desc">Reset stuck records, requeue errors, queue new charts. Error summary and diagnostics.</div>
+            </div>
+        </div>
+        
+        <!-- Admin Console Architecture -->
+        <div class="diagram-container">
+            <div class="diagram-title">Admin Console Components</div>
+            <svg class="diagram-svg" viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg">
+                <!-- Central Admin -->
+                <rect x="350" y="80" width="200" height="90" rx="10" fill="#1a73a7" filter="url(#shadow)"/>
+                <text x="450" y="115" font-size="16" font-weight="700" fill="black" text-anchor="middle">Admin Console</text>
+                <text x="450" y="140" font-size="12" fill="black" text-anchor="middle" opacity="0.9">Flask + SocketIO</text>
+                <text x="450" y="158" font-size="11" fill="black" text-anchor="middle" opacity="0.8">Real-time Updates</text>
+                
+                <!-- Dashboard -->
+                <rect x="50" y="30" width="130" height="60" rx="8" fill="#f0f9ff" stroke="#1a73a7" stroke-width="2"/>
+                <text x="115" y="55" font-size="12" font-weight="600" fill="#1a73a7" text-anchor="middle">📊 Dashboard</text>
+                <text x="115" y="75" font-size="10" fill="#6c7a89" text-anchor="middle">Stats & Charts</text>
+                <line x1="180" y1="60" x2="350" y2="100" stroke="#1a73a7" stroke-width="2"/>
+                
+                <!-- Logs -->
+                <rect x="50" y="120" width="130" height="60" rx="8" fill="#f0f9ff" stroke="#1a73a7" stroke-width="2"/>
+                <text x="115" y="145" font-size="12" font-weight="600" fill="#1a73a7" text-anchor="middle">📋 Live Logs</text>
+                <text x="115" y="165" font-size="10" fill="#6c7a89" text-anchor="middle">SSE Streaming</text>
+                <line x1="180" y1="150" x2="350" y2="125" stroke="#1a73a7" stroke-width="2"/>
+                
+                <!-- Config -->
+                <rect x="720" y="30" width="130" height="60" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="785" y="55" font-size="12" font-weight="600" fill="#92400e" text-anchor="middle">⚙️ Config</text>
+                <text x="785" y="75" font-size="10" fill="#6c7a89" text-anchor="middle">Settings Editor</text>
+                <line x1="550" y1="100" x2="720" y2="60" stroke="#f59e0b" stroke-width="2"/>
+                
+                <!-- Measures -->
+                <rect x="720" y="120" width="130" height="60" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+                <text x="785" y="145" font-size="12" font-weight="600" fill="#065f46" text-anchor="middle">📝 Measures</text>
+                <text x="785" y="165" font-size="10" fill="#6c7a89" text-anchor="middle">JSON Editor</text>
+                <line x1="550" y1="125" x2="720" y2="150" stroke="#10b981" stroke-width="2"/>
+                
+                <!-- Service -->
+                <rect x="250" y="200" width="130" height="50" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+                <text x="315" y="225" font-size="12" font-weight="600" fill="#991b1b" text-anchor="middle">🔧 Service Control</text>
+                <line x1="315" y1="200" x2="400" y2="170" stroke="#ef4444" stroke-width="2"/>
+                
+                <!-- Database -->
+                <rect x="520" y="200" width="130" height="50" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+                <text x="585" y="225" font-size="12" font-weight="600" fill="#5b21b6" text-anchor="middle">🗃️ Database Ops</text>
+                <line x1="500" y1="170" x2="585" y2="200" stroke="#7c3aed" stroke-width="2"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Benefits Tab -->
+    <div class="tab-content" id="benefits">
+        <h2 class="section-title">Benefits Summary</h2>
+        <p class="section-subtitle">Why choose this solution</p>
+        
+        <ul class="benefits-list">
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Highly Configurable</strong> — Add, modify, or remove measures through JSON configuration. No code changes required for measure updates.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Easily Maintainable</strong> — Full code ownership with modular architecture. Fix bugs and add features without vendor involvement.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Cost Effective</strong> — Fixed monthly cost using existing Azure OpenAI. No per-page OCR charges. Maximize value with off-peak processing.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Seamlessly Extensible</strong> — Plugin architecture allows new measures to be added with minimal effort. True plug-and-play design.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Can Be Unplugged Anytime</strong> — Solution integrates with existing workflow without dependencies. Can be disabled without affecting core operations.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Uses Existing Infrastructure</strong> — Runs on Pursuit VMs. Uses existing Azure containers and database. No additional servers required.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Full Visibility & Control</strong> — Admin Console provides real-time monitoring, configuration, and troubleshooting capabilities.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Improved User Experience</strong> — Clean, intuitive Salesforce sidebar with precise highlighting and one-click page navigation.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>Scalable Architecture</strong> — Multi-threaded processing with ability to scale across multiple servers based on volume.
+                </div>
+            </li>
+            <li>
+                <span class="icon">✅</span>
+                <div>
+                    <strong>User Satisfaction</strong> — Reviewers prefer the new solution due to better UI, accurate highlighting, and helpful Q&A insights.
+                </div>
+            </li>
+        </ul>
+        
+        <div class="highlight-box success" style="text-align: center; padding: 40px;">
+            <div style="font-size: 60px; margin-bottom: 20px;">🎯</div>
+            <h3 style="font-size: 28px; margin-bottom: 15px;">Production Ready</h3>
+            <p style="font-size: 16px; max-width: 700px; margin: 0 auto;">
+                The HEDIS AI Extraction Solution is deployed and actively processing medical charts 
+                across multiple HEDIS quality measures, delivering accurate insights to clinical reviewers 
+                while maintaining full operational control and cost predictability.
+            </p>
+        </div>
+    </div>
+
+    <!-- Extensibility Tab -->
+    <div class="tab-content" id="extensibility">
+        <h2 class="section-title">Foundation Platform</h2>
+        <p class="section-subtitle">Extensible architecture designed for healthcare data extraction beyond HEDIS</p>
+        
+        <div class="highlight-box info" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b;">
+            <h4>🔮 Vision: One Platform, Multiple Use Cases</h4>
+            <p>This solution is architected as a <strong>foundation platform</strong> — starting with HEDIS quality measures, but designed to extend seamlessly into <strong>Risk Adjustment (HCC)</strong>, <strong>Quality Improvement</strong>, and other clinical data extraction domains using the same core infrastructure.</p>
+        </div>
+        
+        <div class="grid-3" style="margin-top: 30px;">
+            <div class="feature-card" style="border-top: 4px solid #10b981;">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">HEDIS Measures</div>
+                <div class="feature-desc" style="margin-bottom: 15px;">Currently deployed and production-ready for clinical quality measures.</div>
+                <div style="background: #d1fae5; padding: 10px; border-radius: 8px; text-align: center;">
+                    <span style="color: #065f46; font-weight: 600; font-size: 12px;">✅ ACTIVE</span>
+                </div>
+            </div>
+            <div class="feature-card" style="border-top: 4px solid #f59e0b;">
+                <div class="feature-icon">⚠️</div>
+                <div class="feature-title">Risk Adjustment (HCC)</div>
+                <div class="feature-desc" style="margin-bottom: 15px;">Extract HCC codes, diagnoses, and supporting documentation for RAF score optimization.</div>
+                <div style="background: #fef3c7; padding: 10px; border-radius: 8px; text-align: center;">
+                    <span style="color: #92400e; font-weight: 600; font-size: 12px;">🔜 READY TO EXTEND</span>
+                </div>
+            </div>
+            <div class="feature-card" style="border-top: 4px solid #6366f1;">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">Quality Programs</div>
+                <div class="feature-desc" style="margin-bottom: 15px;">Stars Ratings, CAHPS, Care Gaps, and other quality initiatives.</div>
+                <div style="background: #e0e7ff; padding: 10px; border-radius: 8px; text-align: center;">
+                    <span style="color: #3730a3; font-weight: 600; font-size: 12px;">🔮 FUTURE READY</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Foundation Architecture Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-title">Foundation Platform Architecture</div>
+            <svg class="diagram-svg" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="shadow2">
+                        <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+                    </filter>
+                    <linearGradient id="foundationGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#1a73a7"/>
+                        <stop offset="100%" style="stop-color:#2d9cdb"/>
+                    </linearGradient>
+                </defs>
+                
+                <!-- Foundation Layer -->
+                <rect x="50" y="280" width="800" height="100" rx="15" fill="url(#foundationGrad)" filter="url(#shadow2)"/>
+                <text x="450" y="315" font-size="18" font-weight="700" fill="white" text-anchor="middle">🏗️ FOUNDATION PLATFORM</text>
+                <text x="450" y="340" font-size="12" fill="white" text-anchor="middle" opacity="0.9">Core AI Engine • PDF Processing • Azure OpenAI • Coordinate Extraction • Admin Console</text>
+                <text x="450" y="360" font-size="11" fill="white" text-anchor="middle" opacity="0.7">Shared Infrastructure | JSON Configuration | Plugin Architecture | Salesforce Integration</text>
+                
+                <!-- Connecting Lines -->
+                <line x1="200" y1="230" x2="200" y2="280" stroke="#10b981" stroke-width="3" stroke-dasharray="5,5"/>
+                <line x1="450" y1="230" x2="450" y2="280" stroke="#f59e0b" stroke-width="3" stroke-dasharray="5,5"/>
+                <line x1="700" y1="230" x2="700" y2="280" stroke="#6366f1" stroke-width="3" stroke-dasharray="5,5"/>
+                
+                <!-- HEDIS Module -->
+                <rect x="100" y="130" width="200" height="100" rx="12" fill="#d1fae5" stroke="#10b981" stroke-width="3" filter="url(#shadow2)"/>
+                <text x="200" y="165" font-size="14" font-weight="700" fill="#065f46" text-anchor="middle">🎯 HEDIS Module</text>
+                <text x="200" y="185" font-size="11" fill="#047857" text-anchor="middle">CBP | BPD | COL | WCC</text>
+                <text x="200" y="205" font-size="11" fill="#047857" text-anchor="middle">CCS | IMA | BCS | +More</text>
+                <circle cx="200" cy="240" r="8" fill="#10b981"/>
+                
+                <!-- Risk Module -->
+                <rect x="350" y="130" width="200" height="100" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="3" filter="url(#shadow2)"/>
+                <text x="450" y="165" font-size="14" font-weight="700" fill="#92400e" text-anchor="middle">⚠️ Risk Adjustment</text>
+                <text x="450" y="185" font-size="11" fill="#b45309" text-anchor="middle">HCC Codes | Diagnoses</text>
+                <text x="450" y="205" font-size="11" fill="#b45309" text-anchor="middle">RAF Optimization</text>
+                <circle cx="450" cy="240" r="8" fill="#f59e0b"/>
+                
+                <!-- Future Module -->
+                <rect x="600" y="130" width="200" height="100" rx="12" fill="#e0e7ff" stroke="#6366f1" stroke-width="3" filter="url(#shadow2)"/>
+                <text x="700" y="165" font-size="14" font-weight="700" fill="#3730a3" text-anchor="middle">📋 Quality Programs</text>
+                <text x="700" y="185" font-size="11" fill="#4338ca" text-anchor="middle">Stars | CAHPS | Care Gaps</text>
+                <text x="700" y="205" font-size="11" fill="#4338ca" text-anchor="middle">Custom Programs</text>
+                <circle cx="700" cy="240" r="8" fill="#6366f1"/>
+                
+                <!-- Top: Data Sources -->
+                <rect x="250" y="20" width="400" height="70" rx="10" fill="#f5f7fa" stroke="#e1e8ed" stroke-width="2"/>
+                <text x="450" y="50" font-size="14" font-weight="600" fill="#2c3e50" text-anchor="middle">📄 Medical Charts & Clinical Documents</text>
+                <text x="450" y="70" font-size="11" fill="#6c7a89" text-anchor="middle">PDFs | Images | Scanned Records | Lab Results</text>
+                
+                <!-- Arrows from Data Sources -->
+                <path d="M 350 90 L 200 130" stroke="#6c7a89" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+                <path d="M 450 90 L 450 130" stroke="#6c7a89" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+                <path d="M 550 90 L 700 130" stroke="#6c7a89" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+                
+                <defs>
+                    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#6c7a89"/>
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+        
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-title">🧩 Why a Foundation Platform?</div>
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 15px;">Shared Capabilities</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">🔹 <strong>PDF Processing Engine</strong> — Same extraction pipeline</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">🔹 <strong>Azure OpenAI Integration</strong> — Unified LLM access</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">🔹 <strong>Coordinate Highlighting</strong> — Precise source identification</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">🔹 <strong>Admin Console</strong> — Centralized monitoring</li>
+                        <li style="padding: 8px 0;">🔹 <strong>Salesforce UI</strong> — Consistent user experience</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--secondary); margin-bottom: 15px;">Extension Strategy</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">✅ <strong>JSON Configuration</strong> — Define new extraction types</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">✅ <strong>Measure Templates</strong> — Reusable extraction patterns</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">✅ <strong>Q&A Framework</strong> — Customizable clinical questions</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">✅ <strong>Plugin Architecture</strong> — Add modules without core changes</li>
+                        <li style="padding: 8px 0;">✅ <strong>Shared Database</strong> — Unified data storage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Risk Adjustment Preview -->
+        <div class="highlight-box warning" style="margin-top: 30px;">
+            <h4>⚠️ Risk Adjustment (HCC) — Ready to Extend</h4>
+            <p style="margin-bottom: 15px;">The same foundation can power Risk Adjustment coding by extracting:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📋 HCC Codes</span>
+                <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🏥 Diagnosis Evidence</span>
+                <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📅 Date of Service</span>
+                <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">👨‍⚕️ Provider Signatures</span>
+                <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📊 RAF Impact Analysis</span>
+                <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 Supporting Documentation</span>
+            </div>
+        </div>
+        
+        <div class="highlight-box success" style="text-align: center; padding: 40px; margin-top: 30px;">
+            <div style="font-size: 60px; margin-bottom: 20px;">🏗️</div>
+            <h3 style="font-size: 28px; margin-bottom: 15px;">Build Once, Extend Everywhere</h3>
+            <p style="font-size: 16px; max-width: 700px; margin: 0 auto;">
+                The investment in this foundation platform pays dividends across multiple use cases. 
+                As new healthcare data extraction needs emerge, the core infrastructure is ready to support them 
+                with minimal additional development — just add configuration.
+            </p>
+        </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-logo">⚕️ Risk & Quality Services</div>
+    <div class="footer-text">HEDIS AI Extraction — Internal Solution</div>
+    <div style="margin-top: 15px; font-size: 12px; opacity: 0.5;">Document Version 2.1 | 2025 | Internal Use Only</div>
+</footer>
+
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked tab
+            tab.classList.add('active');
+            
+            // Show corresponding content
+            const tabId = tab.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>

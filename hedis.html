@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEDIS AI — Automated Document Extraction</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --coal: #0a0a0a; --onyx: #141414; --graphite: #1a1a1a; --slate: #2a2a2a; --ash: #3a3a3a;
+            --smoke: #7a7a7a; --silver: #a0a0a0; --pearl: #d4d4d4; --ivory: #f0f0f0; --white: #fafafa;
+            --mint: #00e5a0; --mint-glow: rgba(0,229,160,0.15); --mint-dim: rgba(0,229,160,0.08);
+            --cyan: #00d4ff; --amber: #ffb800; --coral: #ff6b6b; --violet: #a78bfa;
+            --violet-glow: rgba(167,139,250,0.15); --violet-dim: rgba(167,139,250,0.08);
+            --font-body: 'DM Sans', system-ui, sans-serif;
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-body); background: var(--coal); color: var(--pearl); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+        .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,10,0.85); backdrop-filter: blur(24px) saturate(1.4); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .nav-back { color: var(--smoke); text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+        .nav-back:hover { color: var(--white); }
+        .nav-title { font-size: 15px; font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 10px; }
+
+        .tabs-bar { position: fixed; top: 64px; left: 0; right: 0; z-index: 99; background: var(--onyx); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 48px; display: flex; align-items: center; gap: 16px; }
+        .tabs { display: flex; gap: 4px; overflow-x: auto; flex: 1; }
+        .tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--smoke); background: none; border: none; cursor: pointer; white-space: nowrap; transition: all 0.2s; position: relative; font-family: var(--font-body); }
+        .tab:hover { color: var(--pearl); }
+        .tab.active { color: var(--violet); }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--violet); }
+
+        .demo-btn-bar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 16px; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 100px; color: var(--violet); font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; font-family: var(--font-body); flex-shrink: 0;
+        }
+        .demo-btn-bar:hover { background: rgba(167,139,250,0.2); }
+        .demo-btn-bar .play { width: 20px; height: 20px; border-radius: 50%; background: var(--violet); display: inline-flex; align-items: center; justify-content: center; }
+        .demo-btn-bar .play::after { content: ''; width: 0; height: 0; border-left: 6px solid var(--coal); border-top: 4px solid transparent; border-bottom: 4px solid transparent; margin-left: 1px; }
+
+        .spacer { height: 120px; }
+        .content { max-width: 1200px; margin: 0 auto; padding: 40px 48px; }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title { font-family: var(--font-display); font-size: 42px; color: var(--white); margin-bottom: 8px; font-weight: 400; }
+        .page-title em { font-style: italic; color: var(--violet); }
+        .page-sub { font-size: 16px; color: var(--smoke); margin-bottom: 40px; max-width: 700px; }
+        .section-title { font-family: var(--font-display); font-size: 28px; color: var(--white); margin: 48px 0 16px; font-weight: 400; }
+        .section-title:first-child { margin-top: 0; }
+
+        .card { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; }
+        .card-header { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .card p, .card li { color: var(--smoke); font-size: 14px; line-height: 1.7; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+        @media (max-width: 1024px) { .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } .content { padding: 24px; } .tabs-bar, .nav { padding: 0 16px; } }
+
+        .stat-box { background: var(--onyx); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 24px; text-align: center; }
+        .stat-val { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--violet); }
+        .stat-label { font-size: 12px; color: var(--smoke); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        .highlight { padding: 24px 28px; border-radius: var(--radius-sm); margin: 24px 0; border-left: 4px solid; }
+        .highlight.violet { background: var(--violet-dim); border-color: var(--violet); }
+        .highlight.green { background: var(--mint-dim); border-color: var(--mint); }
+        .highlight.amber { background: rgba(255,184,0,0.06); border-color: var(--amber); }
+        .highlight h4 { color: var(--white); margin-bottom: 8px; }
+        .highlight p, .highlight li { color: var(--silver); font-size: 14px; }
+
+        .step-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .step-card { background: var(--graphite); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 20px; display: flex; gap: 16px; }
+        .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--violet); color: var(--coal); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .step-card h4 { color: var(--white); font-size: 14px; margin-bottom: 4px; }
+        .step-card p { color: var(--smoke); font-size: 13px; line-height: 1.5; }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .tag { font-size: 12px; padding: 4px 14px; border-radius: 100px; background: rgba(255,255,255,0.04); color: var(--silver); border: 1px solid rgba(255,255,255,0.08); }
+        .tag.ai { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.15); color: var(--cyan); }
+        .tag.ml { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.15); color: var(--violet); }
+        .tag.infra { background: rgba(255,184,0,0.08); border-color: rgba(255,184,0,0.15); color: var(--amber); }
+
+        .check-list { list-style: none; padding: 0; }
+        .check-list li { padding: 10px 0; display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--pearl); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .check-list li:last-child { border-bottom: none; }
+        .check-icon { color: var(--mint); font-weight: 700; flex-shrink: 0; }
+
+        .measure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+        .measure-chip { background: var(--graphite); border: 1px solid rgba(167,139,250,0.15); border-radius: var(--radius-xs); padding: 10px 14px; text-align: center; font-size: 13px; color: var(--pearl); font-weight: 500; transition: border-color 0.2s; }
+        .measure-chip:hover { border-color: var(--violet); }
+        .measure-chip.done { border-color: rgba(0,229,160,0.3); }
+        .measure-chip.done::before { content: '✓ '; color: var(--mint); }
+
+        /* Comparison table */
+        .compare-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+        .compare-table th { padding: 14px 20px; text-align: left; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .compare-table th:nth-child(1) { color: var(--smoke); background: var(--graphite); border-radius: var(--radius-xs) 0 0 0; }
+        .compare-table th:nth-child(2) { color: var(--coral); background: rgba(255,107,107,0.08); }
+        .compare-table th:nth-child(3) { color: var(--mint); background: rgba(0,229,160,0.08); border-radius: 0 var(--radius-xs) 0 0; }
+        .compare-table td { padding: 12px 20px; font-size: 13px; color: var(--pearl); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .compare-table tr:nth-child(even) td { background: rgba(255,255,255,0.01); }
+
+        .footer { padding: 48px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; font-size: 13px; color: var(--smoke); }
+
+        /* Video modal */
+        .video-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 200; justify-content: center; align-items: center; padding: 48px; }
+        .video-modal.active { display: flex; }
+        .video-modal-inner { width: 100%; max-width: 960px; position: relative; }
+        .video-close { position: absolute; top: -48px; right: 0; background: none; border: none; color: var(--white); font-size: 28px; cursor: pointer; padding: 8px; }
+        .video-modal video { width: 100%; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <a href="index.html" class="nav-back">← Back to Next-Era AI</a>
+    <div class="nav-title"><span>🎯</span> HEDIS AI Extraction</div>
+</nav>
+
+<div class="tabs-bar">
+    <div class="tabs">
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="architecture">Architecture</button>
+        <button class="tab" data-tab="measures">Measures</button>
+        <button class="tab" data-tab="salesforce">Salesforce UI</button>
+        <button class="tab" data-tab="comparison">Before vs After</button>
+        <button class="tab" data-tab="roi">ROI & Results</button>
+    </div>
+    <button class="demo-btn-bar" onclick="openVideo()"><span class="play"></span> Watch Demo</button>
+</div>
+
+<div class="spacer"></div>
+<main class="content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div class="tab-panel active" id="overview">
+        <h1 class="page-title">HEDIS AI <em>Extraction</em></h1>
+        <p class="page-sub">AI-powered medical chart processing system that extracts HEDIS quality measure data from clinical documents. Uses multi-agent LLM architecture with LangGraph to analyze PDFs, extract clinical information, answer compliance questions, and provide coordinate-based highlighting.</p>
+
+        <div class="grid-4">
+            <div class="stat-box"><div class="stat-val">1M+</div><div class="stat-label">Charts Processed</div></div>
+            <div class="stat-box"><div class="stat-val">92%</div><div class="stat-label">Accuracy</div></div>
+            <div class="stat-box"><div class="stat-val">16/21</div><div class="stat-label">Measures</div></div>
+            <div class="stat-box"><div class="stat-val">10x</div><div class="stat-label">Throughput</div></div>
+        </div>
+
+        <div class="highlight violet">
+            <h4>💼 Business Challenge</h4>
+            <p>Clinical reviewers manually process thousands of medical charts annually for HEDIS quality measure compliance. The previous vendor solution had unpredictable per-page OCR costs, over-highlighting issues, poor user experience, and no code ownership. Reviewers spent excessive time navigating large PDFs to find relevant clinical information.</p>
+        </div>
+
+        <h2 class="section-title">Technical Approach</h2>
+        <div class="step-grid">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <div>
+                    <h4>Chart Ingestion</h4>
+                    <p>Charts uploaded to CHART.MASTER table with Azure Blob URL and measure type (CBP, BPD, COL, WCC, etc.)</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <div>
+                    <h4>Multi-threaded Processing</h4>
+                    <p>Worker threads claim records from queue, download PDFs, verify text extraction using open-source Tesseract OCR</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <div>
+                    <h4>Measure-Specific Extraction</h4>
+                    <p>Factory pattern routes to correct processor (COL, BPD, WCC). Each measure has JSON config for keywords and Q&A</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">4</div>
+                <div>
+                    <h4>LLM Processing</h4>
+                    <p>Azure OpenAI GPT-4o extracts clinical data, answers measure questions, identifies exact text coordinates</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">5</div>
+                <div>
+                    <h4>JSON Output Generation</h4>
+                    <p>Creates highlights.json, summary.json, qa.json with coordinate data uploaded to Azure Blob container</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">6</div>
+                <div>
+                    <h4>Salesforce Integration</h4>
+                    <p>Updates Chart object with AI URLs. LWC sidebar displays highlights, Q&A with one-click page navigation</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Technology Stack</h2>
+        <div class="tags" style="margin-top: 0;">
+            <span class="tag ai">Azure OpenAI GPT-4o</span>
+            <span class="tag ai">LangChain</span>
+            <span class="tag ml">LangGraph Multi-Agent</span>
+            <span class="tag">Python</span>
+            <span class="tag">Flask Admin Console</span>
+            <span class="tag infra">Azure Blob Storage</span>
+            <span class="tag infra">SQL Server</span>
+            <span class="tag">Salesforce LWC</span>
+            <span class="tag">Tesseract OCR</span>
+        </div>
+
+        <div class="highlight green" style="margin-top: 32px;">
+            <h4>✅ Key Benefits</h4>
+            <ul class="check-list" style="margin-top: 8px;">
+                <li><span class="check-icon">✓</span> <strong>Plugin Architecture</strong> — Add new measures via JSON config without code changes</li>
+                <li><span class="check-icon">✓</span> <strong>Full Code Ownership</strong> — No vendor dependency, immediate bug fixes</li>
+                <li><span class="check-icon">✓</span> <strong>Fixed Monthly Cost</strong> — Uses existing Azure OpenAI, no per-page OCR charges</li>
+                <li><span class="check-icon">✓</span> <strong>Precise Highlighting</strong> — Coordinate-based, no over-highlighting</li>
+                <li><span class="check-icon">✓</span> <strong>Admin Console</strong> — Real-time dashboard, live logs, measure config editor</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══ ARCHITECTURE ═══ -->
+    <div class="tab-panel" id="architecture">
+        <h1 class="page-title">System <em>Architecture</em></h1>
+        <p class="page-sub">Multi-layer architecture from chart ingestion to Salesforce display, with parallel processing and admin monitoring at every stage.</p>
+
+        <div class="card">
+            <div class="card-header">🏗️ Processing Pipeline</div>
+            <div class="step-grid">
+                <div class="step-card">
+                    <div class="step-num" style="background: var(--cyan);">1</div>
+                    <div>
+                        <h4>Ingestion Layer</h4>
+                        <p>CHART.MASTER queue → Azure Blob download → Text extraction (Tesseract OCR fallback) → Processing queue dispatch</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num" style="background: var(--cyan);">2</div>
+                    <div>
+                        <h4>Processing Engine</h4>
+                        <p>Multi-threaded workers → Factory pattern routing → Measure-specific processor selection → JSON config lookup</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num" style="background: var(--amber);">3</div>
+                    <div>
+                        <h4>AI / LLM Layer</h4>
+                        <p>LangGraph agent orchestration → GPT-4o clinical extraction → Keyword matching → Coordinate calculation → Q&A generation</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num" style="background: var(--amber);">4</div>
+                    <div>
+                        <h4>Output Layer</h4>
+                        <p>highlights.json + summary.json + qa.json → Azure Blob upload → Chart record URL update → Status tracking</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num" style="background: var(--mint);">5</div>
+                    <div>
+                        <h4>Salesforce Integration</h4>
+                        <p>LWC sidebar component → JSON fetch from Blob → Highlight overlay on PDF → One-click page navigation → Q&A panel</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num" style="background: var(--mint);">6</div>
+                    <div>
+                        <h4>Admin & Monitoring</h4>
+                        <p>Flask admin console → Real-time processing logs → Measure config editor → Error tracking → Performance dashboards</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">⚙️ Component Stack</div>
+            <div class="grid-3">
+                <div>
+                    <h4 style="color: var(--cyan); margin-bottom: 12px; font-size: 14px;">AI / ML</h4>
+                    <ul class="check-list">
+                        <li><span class="check-icon">→</span> Azure OpenAI GPT-4o</li>
+                        <li><span class="check-icon">→</span> LangChain / LangGraph</li>
+                        <li><span class="check-icon">→</span> Multi-Agent Orchestration</li>
+                        <li><span class="check-icon">→</span> Tesseract OCR</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--amber); margin-bottom: 12px; font-size: 14px;">Backend</h4>
+                    <ul class="check-list">
+                        <li><span class="check-icon">→</span> Python Processing Engine</li>
+                        <li><span class="check-icon">→</span> Flask Admin Console</li>
+                        <li><span class="check-icon">→</span> Multi-threaded Workers</li>
+                        <li><span class="check-icon">→</span> Apigee / Azure APIM</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--mint); margin-bottom: 12px; font-size: 14px;">Infrastructure</h4>
+                    <ul class="check-list">
+                        <li><span class="check-icon">→</span> Azure Blob Storage</li>
+                        <li><span class="check-icon">→</span> SQL Server</li>
+                        <li><span class="check-icon">→</span> Salesforce Lightning (LWC)</li>
+                        <li><span class="check-icon">→</span> Pursuit VM Cluster</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MEASURES ═══ -->
+    <div class="tab-panel" id="measures">
+        <h1 class="page-title">Supported <em>Measures</em></h1>
+        <p class="page-sub">Plugin-based architecture supporting 21 HEDIS measures. 16 completed and in production, 5 remaining. Each measure has its own JSON configuration — no code changes required to add new ones.</p>
+
+        <h2 class="section-title">Completed Measures (16/21)</h2>
+        <div class="measure-grid">
+            <div class="measure-chip done">CBP</div>
+            <div class="measure-chip done">BPD</div>
+            <div class="measure-chip done">COL</div>
+            <div class="measure-chip done">CCS</div>
+            <div class="measure-chip done">COA</div>
+            <div class="measure-chip done">WCC</div>
+            <div class="measure-chip done">CIS</div>
+            <div class="measure-chip done">IMA</div>
+            <div class="measure-chip done">LSC</div>
+            <div class="measure-chip done">AIS</div>
+            <div class="measure-chip done">OMW</div>
+            <div class="measure-chip done">SPR</div>
+            <div class="measure-chip done">CDC</div>
+            <div class="measure-chip done">PPC</div>
+            <div class="measure-chip done">W30</div>
+            <div class="measure-chip done">W15</div>
+        </div>
+
+        <h2 class="section-title">Remaining Measures (5)</h2>
+        <div class="measure-grid">
+            <div class="measure-chip">AWC</div>
+            <div class="measure-chip">ADD</div>
+            <div class="measure-chip">FUM</div>
+            <div class="measure-chip">APM</div>
+            <div class="measure-chip">DRR</div>
+        </div>
+
+        <div class="highlight violet" style="margin-top: 32px;">
+            <h4>🔌 Plugin Architecture</h4>
+            <p>Each measure is defined by a JSON config file specifying: measure code, relevant keywords, extraction questions, page filtering rules, and output format. Adding a new measure involves creating a config file and mapping it in the factory — no core code changes needed. This enables rapid expansion to new document types.</p>
+        </div>
+    </div>
+
+    <!-- ═══ SALESFORCE UI ═══ -->
+    <div class="tab-panel" id="salesforce">
+        <h1 class="page-title">Salesforce <em>Integration</em></h1>
+        <p class="page-sub">Custom Lightning Web Components provide a seamless review experience inside Salesforce, with AI-powered highlights overlay and intelligent Q&A panel.</p>
+
+        <div class="card">
+            <div class="card-header">🖥️ Reviewer Experience</div>
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: var(--white); margin-bottom: 12px;">PDF Viewer + Highlight Overlay</h4>
+                    <ul class="check-list">
+                        <li><span class="check-icon">✓</span> PDF rendered inline with coordinate-based AI highlights</li>
+                        <li><span class="check-icon">✓</span> Color-coded highlights by information type</li>
+                        <li><span class="check-icon">✓</span> One-click navigation to highlighted pages</li>
+                        <li><span class="check-icon">✓</span> Zoom, pan, and full-screen support</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--white); margin-bottom: 12px;">AI Sidebar Panel</h4>
+                    <ul class="check-list">
+                        <li><span class="check-icon">✓</span> Summary of extracted information</li>
+                        <li><span class="check-icon">✓</span> Q&A panel with measure-specific questions</li>
+                        <li><span class="check-icon">✓</span> Evidence references linked to PDF pages</li>
+                        <li><span class="check-icon">✓</span> Accept / Override controls for reviewers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">🔗 Integration Points</div>
+            <div class="grid-3">
+                <div>
+                    <h4 style="color: var(--violet); font-size: 14px; margin-bottom: 8px;">Chart Object</h4>
+                    <p>Custom Salesforce object storing chart metadata, measure type, AI processing status, and Blob URLs for highlights and Q&A data.</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--violet); font-size: 14px; margin-bottom: 8px;">LWC Components</h4>
+                    <p>PDF Viewer component, Highlight Overlay component, Q&A Sidebar component, and Processing Status component — all modular and reusable.</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--violet); font-size: 14px; margin-bottom: 8px;">API Layer</h4>
+                    <p>Apex REST endpoints call Azure APIM → Python backend. Status polling, bulk processing triggers, and admin controls all via REST.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ COMPARISON ═══ -->
+    <div class="tab-panel" id="comparison">
+        <h1 class="page-title">Before vs <em>After</em></h1>
+        <p class="page-sub">Side-by-side comparison of the previous vendor solution against the AI-powered extraction system.</p>
+
+        <div class="card" style="overflow-x: auto;">
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>❌ Previous Solution</th>
+                        <th>✅ HEDIS AI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>OCR Cost</strong></td>
+                        <td>Per-page OCR charges (unpredictable)</td>
+                        <td>$0 — Tesseract OCR (open-source)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Highlighting</strong></td>
+                        <td>Over-highlighting, noisy results</td>
+                        <td>Coordinate-based precision highlighting</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Code Ownership</strong></td>
+                        <td>Black box vendor solution</td>
+                        <td>Full ownership, instant bug fixes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extensibility</strong></td>
+                        <td>Vendor-dependent changes, slow turnaround</td>
+                        <td>JSON config — add measures in hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Q&A Capability</strong></td>
+                        <td>None</td>
+                        <td>AI-powered Q&A per measure type</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Processing Speed</strong></td>
+                        <td>Sequential, slow</td>
+                        <td>Multi-threaded, 10x throughput</td>
+                    </tr>
+                    <tr>
+                        <td><strong>UX</strong></td>
+                        <td>Separate portal, poor navigation</td>
+                        <td>Native Salesforce LWC integration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Admin Visibility</strong></td>
+                        <td>Minimal reporting</td>
+                        <td>Real-time console with live logs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══ ROI ═══ -->
+    <div class="tab-panel" id="roi">
+        <h1 class="page-title">ROI & <em>Results</em></h1>
+        <p class="page-sub">Measurable impact across cost, efficiency, quality, and operational scalability.</p>
+
+        <div class="grid-4">
+            <div class="stat-box"><div class="stat-val">70%</div><div class="stat-label">Review Time Saved</div></div>
+            <div class="stat-box"><div class="stat-val">92%</div><div class="stat-label">Extraction Accuracy</div></div>
+            <div class="stat-box"><div class="stat-val">10x</div><div class="stat-label">Processing Throughput</div></div>
+            <div class="stat-box"><div class="stat-val">$0</div><div class="stat-label">Per-Page OCR Cost</div></div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 32px;">
+            <div class="card" style="border-left: 3px solid var(--coral);">
+                <div class="card-header" style="color: var(--coral);">❌ Previous Cost Model</div>
+                <ul class="check-list">
+                    <li><span style="color: var(--coral);">$</span> Per-page OCR charges</li>
+                    <li><span style="color: var(--coral);">$</span> Vendor licensing fees</li>
+                    <li><span style="color: var(--coral);">$</span> Change request charges</li>
+                    <li><span style="color: var(--coral);">$</span> Unpredictable monthly bills</li>
+                </ul>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--mint);">
+                <div class="card-header" style="color: var(--mint);">✅ New Cost Model</div>
+                <ul class="check-list">
+                    <li><span class="check-icon">✓</span> Fixed Azure OpenAI subscription</li>
+                    <li><span class="check-icon">✓</span> Zero per-page OCR cost</li>
+                    <li><span class="check-icon">✓</span> Full code ownership — no vendor fees</li>
+                    <li><span class="check-icon">✓</span> Predictable, flat monthly cost</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="highlight green" style="margin-top: 24px;">
+            <h4>📈 Projected Annual Savings</h4>
+            <p>Estimated $10M+ in annual operational savings from reduced manual review time, eliminated vendor costs, improved throughput, and increased accuracy across the HEDIS quality measure program.</p>
+        </div>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <strong>Next-Era AI</strong> — HEDIS AI Extraction<br>
+    <span style="color: var(--ash);">Confidential • Internal Use Only</span>
+</footer>
+
+<!-- Video Modal -->
+<div class="video-modal" id="videoModal">
+    <div class="video-modal-inner">
+        <button class="video-close" onclick="closeVideo()">✕</button>
+        <video id="videoPlayer" controls>
+            <source src="hedis-demo.mp4" type="video/mp4">
+        </video>
+        <p style="text-align:center; color: var(--smoke); margin-top: 12px; font-size: 13px;">HEDIS AI — Product Demo</p>
+    </div>
+</div>
+
+<script>
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Video
+    function openVideo() {
+        document.getElementById('videoModal').classList.add('active');
+        document.getElementById('videoPlayer').play();
+    }
+    function closeVideo() {
+        document.getElementById('videoPlayer').pause();
+        document.getElementById('videoModal').classList.remove('active');
+    }
+    document.getElementById('videoModal').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeVideo();
+    });
+</script>
+</body>
+</html>
