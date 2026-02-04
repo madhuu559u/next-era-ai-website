@@ -1355,19 +1355,27 @@ function openVideo(product) {
 
   caption.textContent = v.title;
 
-  // hard reset (kills autoplay edge cases)
+  // hard reset
   player.pause();
   player.removeAttribute('src');
   player.load();
 
-  // set new source, but DO NOT play
+  // set new source and autoplay
   player.src = v.src;
-  player.autoplay = true;
-  player.load();
-  player.pause();
   player.currentTime = 0;
 
+  // show modal first, then play
   modal.classList.add('active');
+
+  // use canplay event to ensure video is ready before playing
+  player.addEventListener('canplay', function onCanPlay() {
+    player.removeEventListener('canplay', onCanPlay);
+    player.play().catch(function() {
+      // browser blocked autoplay — video stays paused with controls visible
+    });
+  });
+
+  player.load();
 }
 
 function closeVideo() {
