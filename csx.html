@@ -10,7 +10,8 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        *{font-family:'DM Sans',system-ui,sans-serif}.mono{font-family:'JetBrains Mono',monospace}
+        *{font-family:'DM Sans',system-ui,sans-serif;box-sizing:border-box}
+        .mono{font-family:'JetBrains Mono',monospace}
         .rail-grad{background:linear-gradient(135deg,#0B1929 0%,#0D2847 40%,#1A1A2E 100%)}
         .accent-grad{background:linear-gradient(135deg,#00B4D8 0%,#0077B6 50%,#023E8A 100%)}
         .glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08)}
@@ -21,12 +22,46 @@
         @keyframes glow{0%,100%{box-shadow:0 0 5px rgba(0,180,216,.3)}50%{box-shadow:0 0 20px rgba(0,180,216,.6)}}
         .pulse-b{animation:glow 2s ease-in-out infinite}
         .hide-scroll::-webkit-scrollbar{display:none}.hide-scroll{-ms-overflow-style:none;scrollbar-width:none}
+
+        /* Hero animations */
+        @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes pulseDot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+        @keyframes scanline{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+        @keyframes countUp{from{opacity:0;transform:translateY(15px) scale(0.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes waveIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        .hero-float{animation:heroFloat 4s ease-in-out infinite}
+        .hero-stat{animation:countUp .6s ease-out forwards;opacity:0}
+        .hero-stat:nth-child(1){animation-delay:.1s}
+        .hero-stat:nth-child(2){animation-delay:.25s}
+        .hero-stat:nth-child(3){animation-delay:.4s}
+        .hero-stat:nth-child(4){animation-delay:.55s}
+        .wave-in{animation:waveIn .6s ease-out forwards;opacity:0}
+        .wave-in:nth-child(1){animation-delay:.05s}
+        .wave-in:nth-child(2){animation-delay:.15s}
+        .wave-in:nth-child(3){animation-delay:.25s}
+        .shimmer-text{background:linear-gradient(90deg,#00B4D8 0%,#90E0EF 25%,#CAF0F8 50%,#90E0EF 75%,#00B4D8 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite}
+
+        /* Responsive table cards */
+        @media(max-width:768px){
+            .resp-table thead{display:none}
+            .resp-table tbody tr{display:block;margin-bottom:12px;border-radius:12px;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)}
+            .resp-table tbody td{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border:none!important}
+            .resp-table tbody td::before{content:attr(data-label);font-weight:600;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;flex-shrink:0;margin-right:12px}
+            .resp-table tbody td:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.05)!important}
+        }
+
+        /* Mobile nav */
+        @media(max-width:640px){
+            .nav-tabs{gap:4px!important}
+            .nav-tabs button{font-size:11px!important;padding:6px 10px!important}
+        }
     </style>
 </head>
 <body class="bg-[#0B1929] text-white">
 <div id="root"></div>
 <script type="text/babel">
-const {useState}=React;
+const {useState,useEffect,useRef}=React;
 
 const D={
     date:'January 27, 2026',dur:'2h 33m 7s',
@@ -113,40 +148,41 @@ function sev(s){return s==='critical'?'bg-red-500':s==='high'?'bg-orange-500':'b
 function App(){
     const [tab,setTab]=useState('overview');
     const tabs=[
-        {id:'overview',l:'Executive Overview'},
-        {id:'challenge',l:'The Challenge'},
-        {id:'solution',l:'Solution & Prompt'},
-        {id:'architecture',l:'Architecture'},
-        {id:'output',l:'17-Section Output'},
-        {id:'dashboard',l:'Dashboard Mockup'},
-        {id:'transcript',l:'Transcript Analysis'},
-        {id:'extensibility',l:'Extensibility & Roadmap'}
+        {id:'overview',l:'Overview',icon:'◈'},
+        {id:'challenge',l:'Challenge',icon:'⚡'},
+        {id:'solution',l:'Solution',icon:'🧠'},
+        {id:'architecture',l:'Architecture',icon:'☁️'},
+        {id:'output',l:'17 Sections',icon:'📋'},
+        {id:'dashboard',l:'Dashboard',icon:'📊'},
+        {id:'transcript',l:'Analysis',icon:'🔍'},
+        {id:'extensibility',l:'Roadmap',icon:'🚀'}
     ];
 
     return (
         <div className="min-h-screen">
             <header className="rail-grad border-b border-white/10 sticky top-0 z-50">
-                <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 accent-grad rounded-xl flex items-center justify-center font-bold text-sm mono">ROI</div>
-                        <div>
-                            <h1 className="font-bold text-[15px] tracking-wide">Railroad Operations Intelligence Platform</h1>
-                            <p className="text-[11px] text-cyan-300/60 tracking-widest uppercase">Business Intelligence • Theory of Constraints • Azure Cloud</p>
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-9 h-9 sm:w-11 sm:h-11 accent-grad rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm mono flex-shrink-0">ROI</div>
+                        <div className="min-w-0">
+                            <h1 className="font-bold text-[13px] sm:text-[15px] tracking-wide truncate">Railroad Operations Intelligence</h1>
+                            <p className="text-[10px] sm:text-[11px] text-cyan-300/60 tracking-widest uppercase truncate">Business Intelligence • Theory of Constraints • Azure Cloud</p>
                         </div>
                     </div>
-                    <div className="hidden md:flex items-center gap-3 text-xs text-slate-400">
+                    <div className="hidden md:flex items-center gap-3 text-xs text-slate-400 flex-shrink-0">
                         <span className="glass px-3 py-1.5 rounded-lg">Confidential</span>
                         <span className="glass px-3 py-1.5 rounded-lg">February 2026</span>
                     </div>
                 </div>
             </header>
 
-            <nav className="bg-[#0D1B2A]/95 border-b border-white/5 sticky top-[52px] z-40 backdrop-blur-xl">
-                <div className="max-w-[1400px] mx-auto px-6 py-2">
-                    <div className="flex gap-1.5 overflow-x-auto hide-scroll">
+            <nav className="bg-[#0D1B2A]/95 border-b border-white/5 sticky top-[48px] sm:top-[52px] z-40 backdrop-blur-xl">
+                <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-2">
+                    <div className="flex gap-1 sm:gap-1.5 overflow-x-auto hide-scroll nav-tabs">
                         {tabs.map(t=>(
                             <button key={t.id} onClick={()=>setTab(t.id)}
-                                className={`px-4 py-2 text-[13px] font-medium whitespace-nowrap rounded-lg transition-all ${tab===t.id?'tab-on':'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                                className={`px-3 sm:px-4 py-2 text-[12px] sm:text-[13px] font-medium whitespace-nowrap rounded-lg transition-all flex items-center gap-1.5 ${tab===t.id?'tab-on':'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                                <span className="hidden sm:inline">{t.icon}</span>
                                 {t.l}
                             </button>
                         ))}
@@ -154,7 +190,7 @@ function App(){
                 </div>
             </nav>
 
-            <main className="max-w-[1400px] mx-auto px-6 py-8">
+            <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
                 {tab==='overview'&&<Overview/>}
                 {tab==='challenge'&&<Challenge/>}
                 {tab==='solution'&&<Solution/>}
@@ -165,8 +201,8 @@ function App(){
                 {tab==='extensibility'&&<Extensibility/>}
             </main>
 
-            <footer className="border-t border-white/5 py-6 text-center text-xs text-slate-500">
-                Railroad Operations Intelligence Platform • Confidential • February 2026 • Powered by Azure OpenAI
+            <footer className="border-t border-white/5 py-6 text-center text-xs text-slate-500 px-4">
+                Railroad Operations Intelligence Platform • Confidential • February 2026 • Powered by Azure OpenAI + Python Web App
             </footer>
         </div>
     );
@@ -175,42 +211,112 @@ function App(){
 function Overview(){
     return (
         <div className="space-y-8 anim">
-            <div className="relative overflow-hidden rounded-2xl p-10 accent-grad">
-                <div className="absolute inset-0 opacity-20" style={{backgroundImage:'repeating-linear-gradient(45deg,transparent,transparent 35px,rgba(255,255,255,0.03) 35px,rgba(255,255,255,0.03) 70px)'}}></div>
-                <div className="relative text-center">
-                    <div className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-sm font-medium mb-6">AI-Powered Business Intelligence for Railroad Operations</div>
-                    <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">From 2.5 Hours of Talk<br/>to Actionable Intelligence</h2>
-                    <p className="text-lg text-blue-100/80 max-w-3xl mx-auto mb-10">
-                        An LLM-powered BI engine that converts daily Net Ops call transcripts into structured analysis — identifying systemic bottlenecks, predicting failures, and driving Train Velocity & ROI through the Theory of Constraints.
-                    </p>
-                    <div className="flex justify-center gap-4 flex-wrap">
-                        {[{v:'500+',l:'Daily Transcripts',s:'June 2025 → Present'},{v:'2.5hr',l:'Avg Call Duration',s:'~150 pages each'},{v:'17',l:'Analysis Sections',s:'Per transcript batch'},{v:'TOC',l:'Goldratt Framework',s:'Physical + Procedural'}].map((s,i)=>(
-                            <div key={i} className="bg-white/10 rounded-xl px-6 py-4 border border-white/10 min-w-[140px]">
-                                <div className="text-2xl font-extrabold mono">{s.v}</div>
-                                <div className="text-sm text-blue-200">{s.l}</div>
-                                <div className="text-[10px] text-blue-300/50 mt-1">{s.s}</div>
-                            </div>
+            {/* HERO — Redesigned */}
+            <div className="relative overflow-hidden rounded-2xl accent-grad" style={{minHeight:'420px'}}>
+                {/* Background patterns */}
+                <div className="absolute inset-0 opacity-10" style={{backgroundImage:'repeating-linear-gradient(45deg,transparent,transparent 35px,rgba(255,255,255,0.03) 35px,rgba(255,255,255,0.03) 70px)'}}></div>
+                <div className="absolute inset-0" style={{background:'radial-gradient(ellipse at 80% 20%, rgba(0,180,216,0.15) 0%, transparent 60%)'}}></div>
+                <div className="absolute inset-0" style={{background:'radial-gradient(ellipse at 20% 80%, rgba(2,62,138,0.2) 0%, transparent 60%)'}}></div>
+
+                {/* Animated dots */}
+                <div className="absolute top-6 right-8 hidden md:block">
+                    <div className="flex gap-2">
+                        {[0,1,2,3,4].map(i=>(
+                            <div key={i} className="w-1.5 h-1.5 bg-cyan-400 rounded-full" style={{animation:`pulseDot 2s ease-in-out infinite`,animationDelay:`${i*0.3}s`}}></div>
                         ))}
+                    </div>
+                </div>
+
+                <div className="relative px-6 sm:px-10 py-10 sm:py-14">
+                    {/* Top badge */}
+                    <div className="flex justify-center mb-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/10 backdrop-blur-sm">
+                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            <span className="text-sm font-medium text-blue-100">AI-Powered Business Intelligence for Railroad Operations</span>
+                        </div>
+                    </div>
+
+                    {/* Main headline */}
+                    <div className="text-center mb-8">
+                        <p className="text-blue-200/60 text-sm uppercase tracking-[0.2em] mb-3 wave-in">Your daily operations call holds untapped intelligence</p>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4">
+                            <span className="block text-white/90">Turn Every Status Call</span>
+                            <span className="block shimmer-text">Into Strategic Insight</span>
+                        </h2>
+                        <p className="text-base sm:text-lg text-blue-100/70 max-w-3xl mx-auto leading-relaxed">
+                            An AI-powered intelligence platform that transforms daily operations call transcripts into
+                            <span className="text-cyan-300 font-semibold"> 17 structured analysis sections</span> —
+                            surfacing systemic bottlenecks, predicting failures, and driving Train Velocity through the Theory of Constraints.
+                        </p>
+                    </div>
+
+                    {/* Visual flow: Talk → Intelligence */}
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10">
+                        <div className="wave-in flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-5 py-3 backdrop-blur-sm">
+                            <div className="text-2xl">🎙️</div>
+                            <div>
+                                <div className="text-xs text-blue-200/50 uppercase tracking-wider">Input</div>
+                                <div className="text-sm font-semibold text-white">Daily Status Call</div>
+                                <div className="text-[10px] text-blue-300/40">Auto-transcribed via Teams</div>
+                            </div>
+                        </div>
+
+                        <div className="wave-in flex flex-col items-center">
+                            <div className="hidden sm:block relative w-16 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent overflow-hidden">
+                                <div className="absolute inset-0" style={{animation:'scanline 1.5s linear infinite',background:'linear-gradient(90deg, transparent, rgba(0,180,216,0.8), transparent)',width:'50%'}}></div>
+                            </div>
+                            <div className="sm:hidden w-[2px] h-8 bg-gradient-to-b from-transparent via-cyan-400 to-transparent"></div>
+                            <div className="text-[9px] text-cyan-300/50 mt-1 uppercase tracking-widest">Azure OpenAI</div>
+                        </div>
+
+                        <div className="wave-in flex items-center gap-3 bg-cyan-500/10 border border-cyan-400/20 rounded-xl px-5 py-3 backdrop-blur-sm">
+                            <div className="text-2xl">📊</div>
+                            <div>
+                                <div className="text-xs text-cyan-300/60 uppercase tracking-wider">Output</div>
+                                <div className="text-sm font-semibold text-cyan-300">Actionable Intelligence</div>
+                                <div className="text-[10px] text-cyan-400/40">17 analysis sections</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="flex justify-center">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 w-full max-w-2xl">
+                            {[
+                                {v:'500+',l:'Daily Transcripts',s:'June 2025 → Present'},
+                                {v:'2.5hr',l:'Avg Call Duration',s:'Auto-transcribed'},
+                                {v:'17',l:'Analysis Sections',s:'Per transcript batch'},
+                                {v:'TOC',l:'Goldratt Framework',s:'Physical + Procedural'}
+                            ].map((s,i)=>(
+                                <div key={i} className="hero-stat bg-white/[0.07] rounded-xl px-4 py-3 sm:px-5 sm:py-4 border border-white/10 text-center backdrop-blur-sm">
+                                    <div className="text-xl sm:text-2xl font-extrabold mono text-white">{s.v}</div>
+                                    <div className="text-xs sm:text-sm text-blue-200/80">{s.l}</div>
+                                    <div className="text-[9px] sm:text-[10px] text-blue-300/40 mt-0.5">{s.s}</div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-5">
-                {[{c:'cyan',t:'What It Is',d:'A business intelligence engine that uses LLMs to convert thousands of hours of technical, conversational railroad operations data into structured analysis.'},
+            {/* What / Does / Helps cards */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                {[{c:'cyan',t:'What It Is',d:'An AI-powered business intelligence engine that converts thousands of hours of technical, conversational railroad operations data into structured, actionable analysis.'},
                   {c:'blue',t:'What It Does',d:'Ingests voice-to-text transcripts of daily 0600 Net Ops calls to track derailments, weather impacts, train velocity, and crew availability across the entire eastern US network.'},
                   {c:'green',t:'How It Helps',d:'Moves management from reactive (dealing with today\'s broken rail) to proactive (predicting that certain weather patterns always cause specific crew failures in Nashville).'}
                 ].map((card,i)=>(
-                    <div key={i} className="glass rounded-xl p-6">
+                    <div key={i} className="glass rounded-xl p-5 sm:p-6">
                         <h3 className="text-lg font-bold mb-2">{card.t}</h3>
                         <p className="text-sm text-slate-300 leading-relaxed">{card.d}</p>
                     </div>
                 ))}
             </div>
 
-            <div className="glass rounded-xl p-6">
+            {/* Value Added */}
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="text-xl font-bold mb-5">💡 Value Added — Train Velocity & ROI</h3>
-                <div className="grid md:grid-cols-2 gap-3">
-                    {['Provides an objective "audit" of operations lost in the noise of a 2.5-hour call',
+                <div className="grid sm:grid-cols-2 gap-3">
+                    {['Provides an objective "audit" of operations lost in the noise of lengthy daily calls',
                       'Drives Train Velocity and ROI by identifying systemic bottlenecks via Theory of Constraints',
                       'Identifies patterns, trends, cause-and-effect from unstructured conversational insight',
                       'Creates structured constraints and actionable SOPs from daily operations discussions',
@@ -218,7 +324,7 @@ function Overview(){
                       'Enables proactive crew/resource positioning based on weather-terminal correlations'
                     ].map((item,i)=>(
                         <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.02]">
-                            <span className="text-cyan-400 mt-0.5">✓</span>
+                            <span className="text-cyan-400 mt-0.5 flex-shrink-0">✓</span>
                             <span className="text-sm text-slate-300">{item}</span>
                         </div>
                     ))}
@@ -233,33 +339,33 @@ function Challenge(){
         <div className="space-y-8 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-sm text-red-400 font-medium mb-4">The Challenge</div>
-                <h2 className="text-3xl font-bold">From Reactive to Proactive Operations</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold">From Reactive to Proactive Operations</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="glass rounded-xl p-6 border-l-4 border-red-500">
-                    <h3 className="text-xl font-bold text-red-400 mb-5">✕ Current State — Reactive</h3>
-                    {['2.5-hour daily calls contain critical intelligence never systematically captured',
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="glass rounded-xl p-5 sm:p-6 border-l-4 border-red-500">
+                    <h3 className="text-lg sm:text-xl font-bold text-red-400 mb-5">✕ Current State — Reactive</h3>
+                    {['Daily status calls contain critical intelligence that is never systematically captured',
                       'Same trains and terminals fail repeatedly — patterns span weeks, invisible to individuals',
                       'Dealing with today\'s broken rail instead of predicting tomorrow\'s failure',
                       'Lessons learned stay in people\'s heads, not in actionable systems',
                       'No systematic way to classify constraints (Physical vs Procedural)',
                       '"We are way too passive tracking down crews — wishing stuff gonna happen instead of making it happen" — Zach Smith'
-                    ].map((item,i)=>(<div key={i} className="flex items-start gap-3 text-sm text-slate-300 mb-3"><span className="text-red-500 mt-1">●</span>{item}</div>))}
+                    ].map((item,i)=>(<div key={i} className="flex items-start gap-3 text-sm text-slate-300 mb-3"><span className="text-red-500 mt-1 flex-shrink-0">●</span><span>{item}</span></div>))}
                 </div>
-                <div className="glass rounded-xl p-6 border-l-4 border-green-500">
-                    <h3 className="text-xl font-bold text-green-400 mb-5">✓ Desired State — Proactive</h3>
+                <div className="glass rounded-xl p-5 sm:p-6 border-l-4 border-green-500">
+                    <h3 className="text-lg sm:text-xl font-bold text-green-400 mb-5">✓ Desired State — Proactive</h3>
                     {['Every call produces structured 17-section intelligence report automatically',
                       'Identify "problem trains" (Train-4 patterns) across 500+ transcripts with day-of-week analysis',
                       'Predict weather patterns that cause specific crew failures at specific terminals',
                       'Convert leadership insights into actionable SOPs automatically',
                       'Theory of Constraints classifies every bottleneck with solutions & thresholds',
                       'Business function agents each analyze their domain independently'
-                    ].map((item,i)=>(<div key={i} className="flex items-start gap-3 text-sm text-slate-300 mb-3"><span className="text-green-500 mt-1">●</span>{item}</div>))}
+                    ].map((item,i)=>(<div key={i} className="flex items-start gap-3 text-sm text-slate-300 mb-3"><span className="text-green-500 mt-1 flex-shrink-0">●</span><span>{item}</span></div>))}
                 </div>
             </div>
-            <div className="rail-grad rounded-xl p-6 border border-white/10">
+            <div className="rail-grad rounded-xl p-5 sm:p-6 border border-white/10">
                 <h3 className="text-lg font-bold mb-4">◈ Theory of Constraints — Goldratt's 5 Focusing Steps</h3>
-                <div className="grid grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                     {[{s:'1',l:'IDENTIFY',d:'Find the constraint',e:'N Radnor crossover switch'},
                       {s:'2',l:'EXPLOIT',d:'Maximize output',e:'Station maintainer during cold'},
                       {s:'3',l:'SUBORDINATE',d:'Align everything',e:'Space trains to Radnor capacity'},
@@ -284,30 +390,30 @@ function Solution(){
         <div className="space-y-8 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-sm text-cyan-400 font-medium mb-4">Solution Design</div>
-                <h2 className="text-3xl font-bold">AI-Powered Operations Intelligence</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold">AI-Powered Operations Intelligence</h2>
                 <p className="text-slate-400 mt-2">Aligned to the 17-section prompt framework</p>
             </div>
-            <div className="glass rounded-xl p-6">
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-6">Data → Intelligence Pipeline</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     {[{i:'🎙️',s:'INGEST',d:'Voice-to-text transcripts from Teams 0600 Net Ops calls via Azure AI Speech',c:'cyan'},
                       {i:'🔍',s:'EXTRACT',d:'Trains (Train-4/6), terminals, customers, crew, constraints, weather',c:'blue'},
                       {i:'🧠',s:'ANALYZE',d:'Pattern detection, TOC classification, cause-effect, cross-transcript (17 sections)',c:'purple'},
-                      {i:'📊',s:'REPORT',d:'Structured analysis, dashboards, SOPs, constraint inventory, coaching',c:'green'}
+                      {i:'📊',s:'REPORT',d:'Python web app with dashboards, SOPs, constraint inventory, coaching insights',c:'green'}
                     ].map((stage,idx)=>(
-                        <div key={idx} className="relative gl rounded-xl p-5 text-center">
-                            <div className="text-3xl mb-3">{stage.i}</div>
-                            <div className="mono font-bold text-sm mb-2" style={{color:stage.c==='cyan'?'#22d3ee':stage.c==='blue'?'#60a5fa':stage.c==='purple'?'#a78bfa':'#4ade80'}}>{stage.s}</div>
-                            <p className="text-xs text-slate-400">{stage.d}</p>
+                        <div key={idx} className="relative gl rounded-xl p-4 sm:p-5 text-center">
+                            <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{stage.i}</div>
+                            <div className="mono font-bold text-xs sm:text-sm mb-2" style={{color:stage.c==='cyan'?'#22d3ee':stage.c==='blue'?'#60a5fa':stage.c==='purple'?'#a78bfa':'#4ade80'}}>{stage.s}</div>
+                            <p className="text-[10px] sm:text-xs text-slate-400">{stage.d}</p>
                             {idx<3&&<div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-cyan-500 font-bold text-xl z-10">→</div>}
                         </div>
                     ))}
                 </div>
             </div>
-            <div className="glass rounded-xl p-6">
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-2">Key Analysis Capabilities</h3>
                 <p className="text-sm text-slate-400 mb-5">Each maps to 17-section prompt requirements</p>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                     {[{t:'Train-4 Pattern Detection',d:'Repeat trains by Train-4 profile across days/weeks. E.g., M404 from M40403/M40405. Day-of-week analysis.',s:'§6'},
                       {t:'Terminal Recurring Issues',d:'Which terminals have repeat problems, what days, how many days, pattern/causality.',s:'§4'},
                       {t:'Constraint Classification',d:'Physical vs Procedural with solutions, indicators, thresholds — actionable per-location.',s:'§14'},
@@ -321,7 +427,7 @@ function Solution(){
                         <div key={i} className="gl rounded-lg p-4">
                             <div className="flex items-center justify-between mb-2">
                                 <h4 className="font-semibold text-sm text-cyan-400">{cap.t}</h4>
-                                <span className="mono text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded">{cap.s}</span>
+                                <span className="mono text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded flex-shrink-0 ml-2">{cap.s}</span>
                             </div>
                             <p className="text-xs text-slate-400">{cap.d}</p>
                         </div>
@@ -337,75 +443,101 @@ function Architecture(){
         <div className="space-y-8 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-sm text-blue-400 font-medium mb-4">Technical Architecture</div>
-                <h2 className="text-3xl font-bold">Azure Cloud Architecture</h2>
-                <p className="text-slate-400 mt-2">Enterprise-grade, scalable — fully within the Microsoft ecosystem</p>
+                <h2 className="text-2xl sm:text-3xl font-bold">Azure Cloud Architecture</h2>
+                <p className="text-slate-400 mt-2">Enterprise-grade, scalable — Python web application for dashboards & analysis</p>
             </div>
-            <div className="glass rounded-2xl p-8" style={{boxShadow:'0 0 30px rgba(0,180,216,0.15)'}}>
+            <div className="glass rounded-2xl p-5 sm:p-8" style={{boxShadow:'0 0 30px rgba(0,180,216,0.15)'}}>
                 <h3 className="font-bold text-lg mb-6 text-center">End-to-End Data Flow</h3>
-                <div className="grid grid-cols-1 md:grid-cols-7 gap-3 items-start">
+                {/* Desktop flow */}
+                <div className="hidden md:grid grid-cols-7 gap-3 items-start">
                     <div className="space-y-3">
                         <div className="accent-grad text-white text-center py-2 rounded-lg font-semibold text-xs">1. SOURCE</div>
                         <div className="gl rounded-lg p-3 text-center"><div className="text-2xl mb-1">📞</div><p className="font-semibold text-xs">MS Teams</p><p className="text-[10px] text-slate-500">0600 Net Ops Call</p></div>
                         <div className="gl rounded-lg p-3 text-center"><div className="text-2xl mb-1">📝</div><p className="font-semibold text-xs">Teams Transcript</p><p className="text-[10px] text-slate-500">.docx w/ speakers</p></div>
                     </div>
-                    <div className="hidden md:flex items-center justify-center text-cyan-500 font-bold text-2xl pt-10">→</div>
+                    <div className="flex items-center justify-center text-cyan-500 font-bold text-2xl pt-10">→</div>
                     <div className="space-y-3">
                         <div className="accent-grad text-white text-center py-2 rounded-lg font-semibold text-xs">2. INGEST</div>
                         <div className="gl rounded-lg p-3 text-center border border-blue-500/20"><div className="text-2xl mb-1">⚡</div><p className="font-semibold text-xs">Power Automate</p><p className="text-[10px] text-slate-500">File trigger</p></div>
                         <div className="gl rounded-lg p-3 text-center border border-blue-500/20"><div className="text-2xl mb-1">🗂️</div><p className="font-semibold text-xs">Blob Storage</p><p className="text-[10px] text-slate-500">Raw transcripts</p></div>
                     </div>
-                    <div className="hidden md:flex items-center justify-center text-cyan-500 font-bold text-2xl pt-10">→</div>
+                    <div className="flex items-center justify-center text-cyan-500 font-bold text-2xl pt-10">→</div>
                     <div className="space-y-3">
                         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-2 rounded-lg font-semibold text-xs">3. AI ENGINE</div>
                         <div className="gl rounded-lg p-3 text-center border border-purple-500/30 pulse-b"><div className="text-2xl mb-1">🧠</div><p className="font-semibold text-xs">Azure OpenAI</p><p className="text-[10px] text-slate-500">GPT-4 / GPT-4o</p><p className="text-[10px] text-cyan-400">17-Section Prompt</p></div>
-                        <div className="gl rounded-lg p-3 text-center border border-purple-500/20"><div className="text-2xl mb-1">⚙️</div><p className="font-semibold text-xs">Azure Functions</p><p className="text-[10px] text-slate-500">Orchestration</p></div>
+                        <div className="gl rounded-lg p-3 text-center border border-purple-500/20"><div className="text-2xl mb-1">⚙️</div><p className="font-semibold text-xs">Azure Functions</p><p className="text-[10px] text-slate-500">Python Orchestration</p></div>
                     </div>
-                    <div className="hidden md:flex items-center justify-center text-cyan-500 font-bold text-2xl pt-10">→</div>
+                    <div className="flex items-center justify-center text-cyan-500 font-bold text-2xl pt-10">→</div>
                     <div className="space-y-3">
                         <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white text-center py-2 rounded-lg font-semibold text-xs">4. DATA & UI</div>
                         <div className="gl rounded-lg p-3 text-center border border-green-500/20"><div className="text-2xl mb-1">🗄️</div><p className="font-semibold text-xs">Cosmos DB</p><p className="text-[10px] text-slate-500">Structured analysis</p></div>
                         <div className="gl rounded-lg p-3 text-center border border-green-500/20"><div className="text-2xl mb-1">🔎</div><p className="font-semibold text-xs">AI Search</p><p className="text-[10px] text-slate-500">Vector embeddings</p></div>
-                        <div className="gl rounded-lg p-3 text-center border border-green-500/20"><div className="text-2xl mb-1">📊</div><p className="font-semibold text-xs">Power BI / App Svc</p><p className="text-[10px] text-slate-500">Dashboard portal</p></div>
+                        <div className="gl rounded-lg p-3 text-center border border-green-500/20"><div className="text-2xl mb-1">🐍</div><p className="font-semibold text-xs">Python Web App</p><p className="text-[10px] text-slate-500">Dashboard portal</p></div>
                     </div>
                 </div>
+                {/* Mobile flow - vertical */}
+                <div className="md:hidden space-y-4">
+                    {[
+                        {step:'1. SOURCE',c:'accent-grad',items:[{icon:'📞',t:'MS Teams',d:'0600 Net Ops Call'},{icon:'📝',t:'Teams Transcript',d:'.docx w/ speakers'}]},
+                        {step:'2. INGEST',c:'accent-grad',items:[{icon:'⚡',t:'Power Automate',d:'File trigger'},{icon:'🗂️',t:'Blob Storage',d:'Raw transcripts'}]},
+                        {step:'3. AI ENGINE',c:'bg-gradient-to-r from-purple-600 to-blue-600',items:[{icon:'🧠',t:'Azure OpenAI',d:'GPT-4 / GPT-4o + 17-Section Prompt'},{icon:'⚙️',t:'Azure Functions',d:'Python Orchestration'}]},
+                        {step:'4. DATA & UI',c:'bg-gradient-to-r from-green-600 to-teal-600',items:[{icon:'🗄️',t:'Cosmos DB',d:'Structured analysis'},{icon:'🔎',t:'AI Search',d:'Vector embeddings'},{icon:'🐍',t:'Python Web App',d:'Dashboard portal'}]}
+                    ].map((block,i)=>(
+                        <div key={i}>
+                            <div className={`${block.c} text-white text-center py-2 rounded-lg font-semibold text-xs mb-2`}>{block.step}</div>
+                            <div className="grid grid-cols-2 gap-2">
+                                {block.items.map((item,j)=>(
+                                    <div key={j} className="gl rounded-lg p-3 text-center border border-white/5">
+                                        <div className="text-xl mb-1">{item.icon}</div>
+                                        <p className="font-semibold text-xs">{item.t}</p>
+                                        <p className="text-[10px] text-slate-500">{item.d}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            {i<3&&<div className="text-center text-cyan-500 text-xl py-1">↓</div>}
+                        </div>
+                    ))}
+                </div>
                 <div className="mt-6 bg-slate-800/50 rounded-xl p-4 border border-white/5">
-                    <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
+                    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs">
                         <span className="font-semibold text-slate-300">Governance & Security:</span>
                         {['Azure AD/Entra ID','Key Vault','RBAC','VNet','Monitor/Log Analytics'].map((s,i)=>(
-                            <span key={i} className="glass px-3 py-1.5 rounded-lg text-slate-400">{s}</span>
+                            <span key={i} className="glass px-2 sm:px-3 py-1.5 rounded-lg text-slate-400 text-[10px] sm:text-xs">{s}</span>
                         ))}
                     </div>
                 </div>
             </div>
+            {/* Responsive table */}
             <div className="glass rounded-xl overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead><tr className="bg-white/5">
-                        <th className="px-5 py-3 text-left font-semibold text-cyan-400 text-xs">Azure Service</th>
-                        <th className="px-5 py-3 text-left font-semibold text-cyan-400 text-xs">Role</th>
-                        <th className="px-5 py-3 text-left font-semibold text-cyan-400 text-xs">Details</th>
-                    </tr></thead>
-                    <tbody className="divide-y divide-white/5">
-                        {[['Microsoft Teams','Source','0600 Net Ops calls with auto-transcription & speaker diarization'],
-                          ['Power Automate','Trigger','File trigger on new transcript upload to SharePoint/OneDrive'],
-                          ['Azure Blob Storage','Raw Storage','Immutable transcript storage for compliance & reprocessing'],
-                          ['Azure AI Speech','Transcription','Optional: enhanced diarization, custom vocabulary (railroad terms)'],
-                          ['Azure Functions (Python)','Orchestration','Serverless: chunk transcripts, prompt batching, retries'],
-                          ['Azure OpenAI (GPT-4o)','LLM Engine','17-section prompt: entity extraction, pattern analysis, TOC classification'],
-                          ['Azure Cosmos DB','Document Store','Structured results, constraints, SOPs, train/terminal entities'],
-                          ['Azure AI Search','Semantic Search','Vector embeddings for cross-transcript queries & trend detection'],
-                          ['Azure App Service','Web Portal','React dashboard — the mockup shown in Dashboard tab'],
-                          ['Power BI','Visualization','Executive dashboards, KPI tracking, velocity reporting'],
-                          ['Azure AD / Entra ID','Identity','SSO, RBAC for sensitive operational data'],
-                          ['Azure Key Vault','Secrets','API keys, connection strings, certificates']
-                        ].map(([s,r,d],i)=>(
-                            <tr key={i} className="hover:bg-white/[0.02]">
-                                <td className="px-5 py-3 font-semibold text-sm">{s}</td>
-                                <td className="px-5 py-3 text-xs text-slate-400">{r}</td>
-                                <td className="px-5 py-3 text-xs text-slate-400">{d}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm resp-table">
+                        <thead><tr className="bg-white/5">
+                            <th className="px-4 sm:px-5 py-3 text-left font-semibold text-cyan-400 text-xs">Azure Service</th>
+                            <th className="px-4 sm:px-5 py-3 text-left font-semibold text-cyan-400 text-xs">Role</th>
+                            <th className="px-4 sm:px-5 py-3 text-left font-semibold text-cyan-400 text-xs">Details</th>
+                        </tr></thead>
+                        <tbody className="divide-y divide-white/5">
+                            {[['Microsoft Teams','Source','0600 Net Ops calls with auto-transcription & speaker diarization'],
+                              ['Power Automate','Trigger','File trigger on new transcript upload to SharePoint/OneDrive'],
+                              ['Azure Blob Storage','Raw Storage','Immutable transcript storage for compliance & reprocessing'],
+                              ['Azure AI Speech','Transcription','Optional: enhanced diarization, custom vocabulary (railroad terms)'],
+                              ['Azure Functions (Python)','Orchestration','Serverless: chunk transcripts, prompt batching, retries'],
+                              ['Azure OpenAI (GPT-4o)','LLM Engine','17-section prompt: entity extraction, pattern analysis, TOC classification'],
+                              ['Azure Cosmos DB','Document Store','Structured results, constraints, SOPs, train/terminal entities'],
+                              ['Azure AI Search','Semantic Search','Vector embeddings for cross-transcript queries & trend detection'],
+                              ['Python Web App (Flask/Dash)','Dashboard Portal','Interactive dashboards, KPI tracking, analysis views — deployed on Azure App Service'],
+                              ['Azure AD / Entra ID','Identity','SSO, RBAC for sensitive operational data'],
+                              ['Azure Key Vault','Secrets','API keys, connection strings, certificates']
+                            ].map(([s,r,d],i)=>(
+                                <tr key={i} className="hover:bg-white/[0.02]">
+                                    <td className="px-4 sm:px-5 py-3 font-semibold text-sm" data-label="Service">{s}</td>
+                                    <td className="px-4 sm:px-5 py-3 text-xs text-slate-400" data-label="Role">{r}</td>
+                                    <td className="px-4 sm:px-5 py-3 text-xs text-slate-400" data-label="Details">{d}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
@@ -416,25 +548,25 @@ function Output(){
         <div className="space-y-8 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm text-purple-400 font-medium mb-4">Analysis Output</div>
-                <h2 className="text-3xl font-bold">17-Section Structured Analysis</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold">17-Section Structured Analysis</h2>
                 <p className="text-slate-400 mt-2">Every transcript batch generates comprehensive intelligence</p>
             </div>
             <div className="flex flex-wrap justify-center gap-2 mb-2">
-                {Object.entries(CC).map(([k,v])=>(<span key={k} className={`px-3 py-1 rounded-full text-xs font-medium ${v.bg} ${v.tx} border ${v.bo}`}>{v.lb}</span>))}
+                {Object.entries(CC).map(([k,v])=>(<span key={k} className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium ${v.bg} ${v.tx} border ${v.bo}`}>{v.lb}</span>))}
             </div>
-            <div className="grid md:grid-cols-3 gap-3">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {SECS.map(s=>{const c=CC[s.cat];return(
                     <div key={s.n} className={`gl rounded-lg p-4 border ${c.bo} hover:bg-white/[0.04] transition-colors`}>
                         <div className="flex items-start gap-3">
                             <span className={`w-8 h-8 ${c.bg} ${c.tx} rounded-lg flex items-center justify-center font-bold text-sm mono flex-shrink-0`}>{s.n}</span>
-                            <div><h4 className="font-semibold text-sm">{s.t}</h4><p className="text-[11px] text-slate-500 mt-1">{s.d}</p></div>
+                            <div className="min-w-0"><h4 className="font-semibold text-sm">{s.t}</h4><p className="text-[11px] text-slate-500 mt-1">{s.d}</p></div>
                         </div>
                     </div>
                 );})}
             </div>
-            <div className="glass rounded-xl p-6 border border-cyan-500/20">
+            <div className="glass rounded-xl p-5 sm:p-6 border border-cyan-500/20">
                 <h3 className="font-bold text-lg mb-4">◈ Example: §14 — Constraint Classification</h3>
-                <div className="gl rounded-lg p-5 mono text-sm space-y-1">
+                <div className="gl rounded-lg p-4 sm:p-5 mono text-xs sm:text-sm space-y-1 overflow-x-auto">
                     <p className="font-bold text-cyan-400">Nashville/Radnor: N Radnor Crossover Switch Failure</p>
                     <p className="text-slate-400">• <span className="text-slate-200 font-semibold">Type:</span> Physical</p>
                     <p className="text-slate-400">• <span className="text-slate-200 font-semibold">Constraint:</span> Crossover switch frozen, would not lock — 2.5hr cascade</p>
@@ -453,44 +585,46 @@ function Dashboard(){
         <div className="space-y-6 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-sm text-green-400 font-medium mb-4">Frontend Mockup</div>
-                <h2 className="text-3xl font-bold">Operations Command Center</h2>
-                <p className="text-slate-400 mt-2">Azure App Service (React) → Cosmos DB → AI Search → Power BI</p>
+                <h2 className="text-2xl sm:text-3xl font-bold">Operations Command Center</h2>
+                <p className="text-slate-400 mt-2">Python Web App (Flask/Dash/Streamlit) → Cosmos DB → AI Search → Azure App Service</p>
             </div>
-            <div className="bg-[#0A0F1C] rounded-2xl p-5 border border-white/10 shadow-2xl">
-                <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/5">
+            <div className="bg-[#0A0F1C] rounded-2xl p-4 sm:p-5 border border-white/10 shadow-2xl">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 pb-4 border-b border-white/5 gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 accent-grad rounded-xl flex items-center justify-center font-bold mono text-sm">ROI</div>
-                        <div><h3 className="font-semibold text-sm">Railroad Operations Intelligence</h3><p className="text-[11px] text-slate-500">{D.date} • 0600 Net Ops • {D.dur}</p></div>
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 accent-grad rounded-xl flex items-center justify-center font-bold mono text-xs sm:text-sm flex-shrink-0">ROI</div>
+                        <div><h3 className="font-semibold text-sm">Railroad Operations Intelligence</h3><p className="text-[10px] sm:text-[11px] text-slate-500">{D.date} • 0600 Net Ops • {D.dur}</p></div>
                     </div>
                     <div className="flex items-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span className="text-green-400 text-xs font-medium">17 Sections Generated</span></div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">E2E Velocity</p>
-                        <div className="flex items-baseline gap-2"><span className="text-2xl font-bold text-green-400 mono">{D.vel.e2e}</span><span className="text-green-400 text-xs">↑{(D.vel.e2e-D.vel.e2e_p).toFixed(1)}</span></div>
+                {/* KPI Row — responsive */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 mb-5">
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
+                        <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider mb-1">E2E Velocity</p>
+                        <div className="flex items-baseline gap-1 sm:gap-2"><span className="text-lg sm:text-2xl font-bold text-green-400 mono">{D.vel.e2e}</span><span className="text-green-400 text-[10px] sm:text-xs">↑{(D.vel.e2e-D.vel.e2e_p).toFixed(1)}</span></div>
                     </div>
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">STB Velocity</p>
-                        <div className="flex items-baseline gap-2"><span className="text-2xl font-bold text-green-400 mono">{D.vel.stb}</span><span className="text-green-400 text-xs">↑{(D.vel.stb-D.vel.stb_p).toFixed(1)}</span></div>
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
+                        <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider mb-1">STB Velocity</p>
+                        <div className="flex items-baseline gap-1 sm:gap-2"><span className="text-lg sm:text-2xl font-bold text-green-400 mono">{D.vel.stb}</span><span className="text-green-400 text-[10px] sm:text-xs">↑{(D.vel.stb-D.vel.stb_p).toFixed(1)}</span></div>
                     </div>
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Active Trains</p>
-                        <span className="text-2xl font-bold mono">{D.trains}</span>
-                        <p className="text-orange-400 text-xs mt-1">{D.late} late ({Math.round(D.late/D.trains*100)}%)</p>
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
+                        <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider mb-1">Active Trains</p>
+                        <span className="text-lg sm:text-2xl font-bold mono">{D.trains}</span>
+                        <p className="text-orange-400 text-[10px] sm:text-xs mt-1">{D.late} late ({Math.round(D.late/D.trains*100)}%)</p>
                     </div>
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Crew Holding</p>
-                        <span className="text-2xl font-bold text-yellow-400 mono">{D.crew.t}</span>
-                        <p className="text-slate-500 text-xs mt-1">{D.crew.h}H / {D.crew.a}A</p>
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
+                        <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider mb-1">Crew Holding</p>
+                        <span className="text-lg sm:text-2xl font-bold text-yellow-400 mono">{D.crew.t}</span>
+                        <p className="text-slate-500 text-[10px] sm:text-xs mt-1">{D.crew.h}H / {D.crew.a}A</p>
                     </div>
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Active Headcount</p>
-                        <span className="text-2xl font-bold mono">{D.headcount.toLocaleString()}</span>
-                        <p className="text-green-400 text-xs mt-1">Sick ↓{D.sickDn}</p>
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5 col-span-2 sm:col-span-1">
+                        <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider mb-1">Active Headcount</p>
+                        <span className="text-lg sm:text-2xl font-bold mono">{D.headcount.toLocaleString()}</span>
+                        <p className="text-green-400 text-[10px] sm:text-xs mt-1">Sick ↓{D.sickDn}</p>
                     </div>
                 </div>
-                <div className="grid md:grid-cols-3 gap-4 mb-5">
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
+                {/* Three columns — responsive */}
+                <div className="grid md:grid-cols-3 gap-3 sm:gap-4 mb-5">
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
                         <h4 className="font-semibold text-sm mb-3">◆ Terminal Status</h4>
                         <div className="space-y-2">
                             {D.terminals.slice(0,5).map((t,i)=>(
@@ -502,37 +636,38 @@ function Dashboard(){
                             ))}
                         </div>
                     </div>
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
                         <h4 className="font-semibold text-sm mb-3">◆ Issue Themes</h4>
                         <div className="space-y-2.5">
                             {D.themes.slice(0,5).map((t,i)=>(
                                 <div key={i} className="flex items-center gap-2">
-                                    <span className="text-[10px] w-28 text-slate-400 truncate">{t.t}</span>
+                                    <span className="text-[10px] w-24 sm:w-28 text-slate-400 truncate flex-shrink-0">{t.t}</span>
                                     <div className="flex-1 h-4 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${sev(t.s)}`} style={{width:`${Math.min(t.c/28*100,100)}%`}}></div></div>
-                                    <span className="mono text-xs font-bold w-6 text-right">{t.c}</span>
+                                    <span className="mono text-xs font-bold w-6 text-right flex-shrink-0">{t.c}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
+                    <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
                         <h4 className="font-semibold text-sm mb-3">◆ Problem Trains (Train-4)</h4>
                         <div className="space-y-2">
                             {D.pTrains.slice(0,5).map((t,i)=>(
                                 <div key={i} className="flex items-center justify-between p-2 bg-slate-800/50 rounded-lg border border-white/5">
-                                    <div><span className="mono text-blue-400 font-bold text-sm">{t.t4}</span><span className="text-[10px] text-slate-500 ml-2">{t.term}</span></div>
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${ic(t.imp)}`}>{t.imp}</span>
+                                    <div className="min-w-0"><span className="mono text-blue-400 font-bold text-sm">{t.t4}</span><span className="text-[10px] text-slate-500 ml-2">{t.term}</span></div>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ml-2 ${ic(t.imp)}`}>{t.imp}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
-                <div className="bg-[#111827] rounded-xl p-4 border border-white/5">
+                {/* Constraints */}
+                <div className="bg-[#111827] rounded-xl p-3 sm:p-4 border border-white/5">
                     <h4 className="font-semibold text-sm mb-3">◆ Active Constraints (TOC)</h4>
-                    <div className="grid md:grid-cols-2 gap-3">
+                    <div className="grid sm:grid-cols-2 gap-3">
                         {D.constraints.slice(0,4).map((c,i)=>(
                             <div key={i} className={`p-3 rounded-lg border ${c.ty==='Physical'?'bg-blue-500/5 border-blue-500/20':'bg-purple-500/5 border-purple-500/20'}`}>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${c.ty==='Physical'?'bg-blue-600 text-white':'bg-purple-600 text-white'}`}>{c.ty}</span>
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${c.ty==='Physical'?'bg-blue-600 text-white':'bg-purple-600 text-white'}`}>{c.ty}</span>
                                     <span className="text-xs font-semibold">{c.n}</span>
                                 </div>
                                 <p className="text-[10px] text-slate-500">📍 {c.loc} | {c.sol}</p>
@@ -542,7 +677,7 @@ function Dashboard(){
                 </div>
             </div>
             <div className="glass rounded-xl p-4 text-center">
-                <p className="text-sm text-slate-400">Dashboard served by <span className="text-cyan-400 font-semibold">Azure App Service</span> → <span className="text-cyan-400 font-semibold">Cosmos DB</span> → <span className="text-cyan-400 font-semibold">AI Search</span> → <span className="text-cyan-400 font-semibold">Power BI</span></p>
+                <p className="text-xs sm:text-sm text-slate-400">Dashboard served by <span className="text-cyan-400 font-semibold">Python Web App</span> → <span className="text-cyan-400 font-semibold">Cosmos DB</span> → <span className="text-cyan-400 font-semibold">AI Search</span> → <span className="text-cyan-400 font-semibold">Azure App Service</span></p>
             </div>
         </div>
     );
@@ -554,31 +689,35 @@ function Transcript(){
         <div className="space-y-8 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm text-orange-400 font-medium mb-4">Live Transcript Analysis</div>
-                <h2 className="text-3xl font-bold">January 27, 2026 — 0600 Net Ops Call</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold">January 27, 2026 — 0600 Net Ops Call</h2>
                 <p className="text-slate-400 mt-2">AI-extracted insights from a 2h 33m transcript</p>
             </div>
-            <div className="glass rounded-xl p-6">
+
+            {/* Themes */}
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-4">§2 — Operational Theme Counts</h3>
                 <div className="space-y-2">
                     {D.themes.map((t,i)=>(
-                        <div key={i} className="flex items-center gap-3">
-                            <span className="text-xs w-44 text-slate-300 truncate">{t.t}</span>
-                            <div className="flex-1 h-5 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${sev(t.s)}`} style={{width:`${Math.min(t.c/28*100,100)}%`}}></div></div>
-                            <span className="mono text-sm font-bold w-8 text-right">{t.c}</span>
-                            <span className="text-[10px] text-slate-500 w-48 truncate hidden md:block">{t.l}</span>
+                        <div key={i} className="flex items-center gap-2 sm:gap-3">
+                            <span className="text-[10px] sm:text-xs w-32 sm:w-44 text-slate-300 truncate flex-shrink-0">{t.t}</span>
+                            <div className="flex-1 h-4 sm:h-5 bg-slate-800 rounded-full overflow-hidden"><div className={`h-full rounded-full ${sev(t.s)}`} style={{width:`${Math.min(t.c/28*100,100)}%`}}></div></div>
+                            <span className="mono text-xs sm:text-sm font-bold w-6 sm:w-8 text-right flex-shrink-0">{t.c}</span>
+                            <span className="text-[10px] text-slate-500 w-48 truncate hidden lg:block flex-shrink-0">{t.l}</span>
                         </div>
                     ))}
                 </div>
             </div>
-            <div className="glass rounded-xl p-6">
+
+            {/* Terminals */}
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-4">§4 — Terminal Recurring Issues</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                     {D.terminals.map((t,i)=>(
                         <div key={i} className={`gl rounded-lg p-4 border ${t.st==='critical'?'border-red-500/30':t.st==='warning'?'border-yellow-500/30':'border-green-500/30'}`}>
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className={`w-3 h-3 rounded-full ${sc(t.st)}`}></span>
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                <span className={`w-3 h-3 rounded-full flex-shrink-0 ${sc(t.st)}`}></span>
                                 <span className="font-semibold text-sm">{t.n}</span>
-                                <span className={`ml-auto px-2 py-0.5 rounded text-[10px] font-bold uppercase ${t.st==='critical'?'bg-red-500/20 text-red-400':t.st==='warning'?'bg-yellow-500/20 text-yellow-400':'bg-green-500/20 text-green-400'}`}>{t.st}</span>
+                                <span className={`ml-auto px-2 py-0.5 rounded text-[10px] font-bold uppercase flex-shrink-0 ${t.st==='critical'?'bg-red-500/20 text-red-400':t.st==='warning'?'bg-yellow-500/20 text-yellow-400':'bg-green-500/20 text-green-400'}`}>{t.st}</span>
                             </div>
                             <p className="text-xs text-slate-400 leading-relaxed">{t.d}</p>
                             <p className="text-[10px] text-slate-600 mt-2">Lead: {t.lead}</p>
@@ -586,36 +725,40 @@ function Transcript(){
                     ))}
                 </div>
             </div>
-            <div className="glass rounded-xl p-6">
+
+            {/* Problem Trains — responsive table */}
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-4">§6 — Problem Trains (Train-4)</h3>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm"><thead><tr className="text-left text-slate-400 border-b border-white/10">
+                    <table className="w-full text-sm resp-table"><thead><tr className="text-left text-slate-400 border-b border-white/10">
                         <th className="pb-3 text-xs">Train-4</th><th className="pb-3 text-xs">Train-6</th><th className="pb-3 text-xs">Terminal</th><th className="pb-3 text-xs">Issues</th><th className="pb-3 text-xs">Impact</th>
                     </tr></thead><tbody>
                         {D.pTrains.map((t,i)=>(
                             <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02]">
-                                <td className="py-3 mono font-bold text-blue-400">{t.t4}</td>
-                                <td className="py-3 mono text-slate-400 text-xs">{t.t6}</td>
-                                <td className="py-3 text-xs text-slate-300">{t.term}</td>
-                                <td className="py-3"><div className="flex flex-wrap gap-1">{t.iss.map((is,j)=>(<span key={j} className="bg-slate-800 px-2 py-0.5 rounded text-[10px] text-slate-300">{is}</span>))}</div></td>
-                                <td className="py-3"><span className={`px-2 py-0.5 rounded text-[10px] font-bold ${ic(t.imp)}`}>{t.imp}</span></td>
+                                <td className="py-3 mono font-bold text-blue-400" data-label="Train-4">{t.t4}</td>
+                                <td className="py-3 mono text-slate-400 text-xs" data-label="Train-6">{t.t6}</td>
+                                <td className="py-3 text-xs text-slate-300" data-label="Terminal">{t.term}</td>
+                                <td className="py-3" data-label="Issues"><div className="flex flex-wrap gap-1">{t.iss.map((is,j)=>(<span key={j} className="bg-slate-800 px-2 py-0.5 rounded text-[10px] text-slate-300 inline-block">{is}</span>))}</div></td>
+                                <td className="py-3" data-label="Impact"><span className={`px-2 py-0.5 rounded text-[10px] font-bold ${ic(t.imp)}`}>{t.imp}</span></td>
                             </tr>
                         ))}
                     </tbody></table>
                 </div>
             </div>
-            <div className="glass rounded-xl p-6">
+
+            {/* Constraints */}
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-4">§14 — Constraints (Physical / Procedural)</h3>
                 <div className="space-y-3">
                     {D.constraints.map((c,i)=>(
                         <div key={i} className={`rounded-xl p-4 border cursor-pointer transition-all ${c.ty==='Physical'?'bg-blue-500/5 border-blue-500/20 hover:border-blue-500/40':'bg-purple-500/5 border-purple-500/20 hover:border-purple-500/40'}`} onClick={()=>setXc(xc===i?null:i)}>
-                            <div className="flex items-center gap-3">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${c.ty==='Physical'?'bg-blue-600 text-white':'bg-purple-600 text-white'}`}>{c.ty}</span>
-                                <span className="font-semibold text-sm flex-1">{c.n}</span>
-                                <span className="text-[10px] text-slate-500">📍 {c.loc}</span>
+                            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex-shrink-0 ${c.ty==='Physical'?'bg-blue-600 text-white':'bg-purple-600 text-white'}`}>{c.ty}</span>
+                                <span className="font-semibold text-sm flex-1 min-w-0">{c.n}</span>
+                                <span className="text-[10px] text-slate-500 flex-shrink-0">📍 {c.loc}</span>
                             </div>
                             {xc===i&&(
-                                <div className="mt-3 pt-3 border-t border-white/5 grid md:grid-cols-3 gap-4 text-xs">
+                                <div className="mt-3 pt-3 border-t border-white/5 grid sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
                                     <div><p className="text-slate-500 text-[10px] uppercase mb-1">Root Cause</p><p className="text-slate-300">{c.ca}</p></div>
                                     <div><p className="text-slate-500 text-[10px] uppercase mb-1">Solution</p><p className="text-green-400">{c.sol}</p></div>
                                     <div><p className="text-slate-500 text-[10px] uppercase mb-1">Indicators</p><p className="text-amber-400">{c.ind}</p></div>
@@ -625,11 +768,13 @@ function Transcript(){
                     ))}
                 </div>
             </div>
-            <div className="glass rounded-xl p-6">
+
+            {/* Lessons */}
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-4">§13 — Lessons Learned & SOPs</h3>
                 <div className="space-y-4">
                     {D.lessons.map((l,i)=>(
-                        <div key={i} className="gl rounded-xl p-5 border border-green-500/20">
+                        <div key={i} className="gl rounded-xl p-4 sm:p-5 border border-green-500/20">
                             <p className="font-semibold text-sm text-red-400 mb-2">Issue: {l.issue}</p>
                             <p className="text-xs text-cyan-300 mb-3 italic">"{l.insight}"</p>
                             <div className="bg-slate-900/50 rounded-lg p-3">
@@ -649,54 +794,54 @@ function Extensibility(){
         <div className="space-y-8 anim">
             <div className="text-center mb-4">
                 <div className="inline-block px-4 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm text-purple-400 font-medium mb-4">Roadmap</div>
-                <h2 className="text-3xl font-bold">Extensibility & Phased Delivery</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold">Extensibility & Phased Delivery</h2>
             </div>
-            <div className="glass rounded-xl p-6">
+            <div className="glass rounded-xl p-5 sm:p-6">
                 <h3 className="font-bold text-lg mb-6">Phased Delivery Roadmap</h3>
-                <div className="grid md:grid-cols-4 gap-4">
-                    {[{p:'Phase 1',t:'Foundation',tm:'Weeks 1–4',items:['Transcript ingestion pipeline','Azure OpenAI integration','17-section prompt execution','Cosmos DB structured storage','Basic web portal'],s:'active'},
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    {[{p:'Phase 1',t:'Foundation',tm:'Weeks 1–4',items:['Transcript ingestion pipeline','Azure OpenAI integration','17-section prompt execution','Cosmos DB structured storage','Python web portal (Flask/Dash)'],s:'active'},
                       {p:'Phase 2',t:'Cross-Transcript Intel',tm:'Weeks 5–8',items:['AI Search embeddings','Train-4 pattern detection','Terminal recurring tracking','Constraint inventory DB'],s:'next'},
-                      {p:'Phase 3',t:'Dashboards & Agents',tm:'Weeks 9–12',items:['Power BI executive dashboards','Business function agents','Real-time alert system','SOP management portal'],s:'planned'},
+                      {p:'Phase 3',t:'Dashboards & Agents',tm:'Weeks 9–12',items:['Python interactive dashboards','Business function agents','Real-time alert system','SOP management portal'],s:'planned'},
                       {p:'Phase 4',t:'Predictive & Graph',tm:'Weeks 13–16',items:['Graph DB (Gremlin/Neo4j)','Weather→failure prediction','Crew availability forecasting','Equipment failure ML'],s:'planned'}
                     ].map((ph,i)=>(
-                        <div key={i} className={`gl rounded-xl p-5 border ${ph.s==='active'?'border-cyan-500/40':ph.s==='next'?'border-blue-500/20':'border-white/5'}`}>
-                            <div className="flex items-center gap-2 mb-3">
+                        <div key={i} className={`gl rounded-xl p-4 sm:p-5 border ${ph.s==='active'?'border-cyan-500/40':ph.s==='next'?'border-blue-500/20':'border-white/5'}`}>
+                            <div className="flex items-center gap-2 mb-3 flex-wrap">
                                 <span className={`mono text-xs font-bold px-2 py-0.5 rounded ${ph.s==='active'?'bg-cyan-500/20 text-cyan-400':ph.s==='next'?'bg-blue-500/20 text-blue-400':'bg-white/5 text-slate-500'}`}>{ph.p}</span>
                                 {ph.s==='active'&&<span className="text-[10px] text-cyan-400 animate-pulse">● PILOT</span>}
                             </div>
                             <h4 className="font-bold text-sm mb-1">{ph.t}</h4>
                             <p className="text-[10px] text-slate-500 mb-3">{ph.tm}</p>
-                            {ph.items.map((it,j)=>(<div key={j} className="flex items-center gap-2 text-xs text-slate-400 mb-1"><span className={`w-1.5 h-1.5 rounded-full ${ph.s==='active'?'bg-cyan-400':ph.s==='next'?'bg-blue-400':'bg-slate-600'}`}></span>{it}</div>))}
+                            {ph.items.map((it,j)=>(<div key={j} className="flex items-center gap-2 text-xs text-slate-400 mb-1"><span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${ph.s==='active'?'bg-cyan-400':ph.s==='next'?'bg-blue-400':'bg-slate-600'}`}></span>{it}</div>))}
                         </div>
                     ))}
                 </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-5">
-                <div className="glass rounded-xl p-6 border-l-4 border-purple-500">
-                    <h3 className="text-lg font-bold mb-3">🔗 Graph Database Integration</h3>
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
+                <div className="glass rounded-xl p-5 sm:p-6 border-l-4 border-purple-500">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">🔗 Graph Database Integration</h3>
                     <p className="text-sm text-slate-400 mb-3">Cosmos DB Graph (Gremlin) or Neo4j:</p>
-                    {['Train→Terminal→Customer relationship chains','Crew→Locomotive→Issue cause-effect paths','Cascading failure analysis','Network topology visualization'].map((i,j)=>(<div key={j} className="flex items-center gap-2 text-sm text-slate-300 mb-1"><span className="text-purple-400">→</span>{i}</div>))}
+                    {['Train→Terminal→Customer relationship chains','Crew→Locomotive→Issue cause-effect paths','Cascading failure analysis','Network topology visualization'].map((i,j)=>(<div key={j} className="flex items-center gap-2 text-sm text-slate-300 mb-1"><span className="text-purple-400 flex-shrink-0">→</span>{i}</div>))}
                 </div>
-                <div className="glass rounded-xl p-6 border-l-4 border-blue-500">
-                    <h3 className="text-lg font-bold mb-3">🤖 Business Function Agents (§10)</h3>
-                    <div className="grid grid-cols-3 gap-2">
+                <div className="glass rounded-xl p-5 sm:p-6 border-l-4 border-blue-500">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">🤖 Business Function Agents (§10)</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {['Network Ops','Crew Mgmt','Loco Mgmt','Mechanical','Engineering','Service Design'].map((a,i)=>(<div key={i} className="gl rounded-lg p-2 text-center text-xs font-medium text-cyan-400">{a}</div>))}
                     </div>
                 </div>
-                <div className="glass rounded-xl p-6 border-l-4 border-green-500">
-                    <h3 className="text-lg font-bold mb-3">⚡ Real-time Data Integration</h3>
-                    {['Train GPS/AEI live position','NWS weather data for prediction','Crew management system feeds','Maintenance scheduling conflicts'].map((i,j)=>(<div key={j} className="flex items-center gap-2 text-sm text-slate-300 mb-1"><span className="text-green-400">→</span>{i}</div>))}
+                <div className="glass rounded-xl p-5 sm:p-6 border-l-4 border-green-500">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">⚡ Real-time Data Integration</h3>
+                    {['Train GPS/AEI live position','NWS weather data for prediction','Crew management system feeds','Maintenance scheduling conflicts'].map((i,j)=>(<div key={j} className="flex items-center gap-2 text-sm text-slate-300 mb-1"><span className="text-green-400 flex-shrink-0">→</span>{i}</div>))}
                 </div>
-                <div className="glass rounded-xl p-6 border-l-4 border-orange-500">
-                    <h3 className="text-lg font-bold mb-3">🔮 Predictive Analytics</h3>
-                    {['Weather→constraint prediction (<20°F → Nashville switch probability)','Day-of-week failure patterns for Train-4','Crew mark-off forecasting by location/season','Equipment failure prediction'].map((i,j)=>(<div key={j} className="flex items-center gap-2 text-sm text-slate-300 mb-1"><span className="text-orange-400">→</span>{i}</div>))}
+                <div className="glass rounded-xl p-5 sm:p-6 border-l-4 border-orange-500">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">🔮 Predictive Analytics</h3>
+                    {['Weather→constraint prediction (<20°F → Nashville switch probability)','Day-of-week failure patterns for Train-4','Crew mark-off forecasting by location/season','Equipment failure prediction'].map((i,j)=>(<div key={j} className="flex items-center gap-2 text-sm text-slate-300 mb-1"><span className="text-orange-400 flex-shrink-0">→</span>{i}</div>))}
                 </div>
             </div>
-            <div className="accent-grad rounded-xl p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">Recommended Pilot</h3>
+            <div className="accent-grad rounded-xl p-6 sm:p-8 text-center">
+                <h3 className="text-xl sm:text-2xl font-bold mb-4">Recommended Pilot</h3>
                 <p className="text-blue-100/80 mb-6 max-w-2xl mx-auto text-sm">30 consecutive days of transcripts, single division focus, to demonstrate value before full deployment.</p>
-                <div className="flex justify-center gap-3 flex-wrap">
-                    {['30-Day Window','Single Division','§1-6 Automated','4-Week Timeline','Accuracy Validation'].map((i,j)=>(<span key={j} className="bg-white/10 rounded-lg px-4 py-2 text-sm border border-white/10">{i}</span>))}
+                <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
+                    {['30-Day Window','Single Division','§1-6 Automated','4-Week Timeline','Accuracy Validation'].map((i,j)=>(<span key={j} className="bg-white/10 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm border border-white/10">{i}</span>))}
                 </div>
             </div>
         </div>
