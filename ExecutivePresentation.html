@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lucid Relay · Leadership Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#05070d; --bg-1:#0a0e1a; --bg-2:#0f1424;
+  --paper:rgba(255,255,255,.04); --paper-strong:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
+  --ink:#f3f5fa; --ink-2:#c9cee0; --ink-3:#8b93ad; --ink-4:#525a72;
+  --csx-navy:#0b3d91; --csx-navy-2:#1763b5; --csx-yellow:#f2a900; --csx-yellow-2:#ffc94d;
+  --teal:#2dd4bf; --teal-2:#34e8d2; --rose:#fb7185;
+  --grad-brand: linear-gradient(135deg, #1763b5 0%, #0b3d91 60%, #05204e 100%);
+  --grad-yellow: linear-gradient(135deg, #ffd56b 0%, #f2a900 100%);
+  --grad-mesh:
+    radial-gradient(900px 460px at 8% -8%, rgba(23,99,181,.30), transparent 55%),
+    radial-gradient(800px 480px at 100% 5%, rgba(242,169,0,.14), transparent 55%),
+    radial-gradient(900px 480px at 60% 100%, rgba(45,212,191,.10), transparent 55%);
+  --serif:'Fraunces','Iowan Old Style','Palatino','Georgia',serif;
+  --sans:'Inter Tight','Inter','SF Pro Text','Helvetica Neue',Arial,sans-serif;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+  --sh-1:0 1px 0 rgba(255,255,255,.04) inset, 0 8px 24px -8px rgba(0,0,0,.6);
+  --sh-2:0 1px 0 rgba(255,255,255,.04) inset, 0 22px 44px -16px rgba(0,0,0,.7);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; padding:0;
+  background:var(--bg-0); background-image:var(--grad-mesh); background-attachment:fixed;
+  color:var(--ink-2);
+  font-family:var(--sans); font-weight:400; font-size:17px; line-height:1.6;
+  letter-spacing:-.005em;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+::selection{background:rgba(242,169,0,.30); color:#fff}
+
+.deck{display:flex; flex-direction:column; gap:0; max-width:1200px; margin:0 auto; padding:32px 24px 80px}
+.slide{
+  position:relative; min-height:88vh;
+  padding:64px clamp(28px,4vw,72px) 72px;
+  margin:24px 0;
+  background:linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01));
+  border:1px solid var(--line); border-radius:24px;
+  box-shadow:var(--sh-2); overflow:hidden;
+}
+.slide::after{
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+  background:radial-gradient(800px 220px at 0% 0%, rgba(23,99,181,.10), transparent 60%);
+}
+.slide > *{position:relative}
+.slidenum{
+  position:absolute; top:24px; right:32px;
+  font-family:var(--mono); font-size:11px; font-weight:600; color:var(--ink-4);
+  letter-spacing:.2em; text-transform:uppercase;
+}
+.kicker{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--sans); font-size:11.5px; font-weight:600; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--csx-yellow);
+  padding:7px 14px; border-radius:999px;
+  background:rgba(242,169,0,.10); border:1px solid rgba(242,169,0,.30);
+}
+.kicker .dot{width:7px; height:7px; border-radius:50%; background:var(--csx-yellow); box-shadow:0 0 12px var(--csx-yellow)}
+
+h1.display{
+  font-family:var(--serif); font-weight:600; letter-spacing:-.04em;
+  font-size:clamp(48px, 7vw, 92px); line-height:.98;
+  margin:.4em 0 .35em; color:var(--ink);
+  background:linear-gradient(135deg,#ffffff 0%, #cad4eb 50%, #f2a900 110%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+h2.display{
+  font-family:var(--serif); font-weight:600; letter-spacing:-.025em;
+  font-size:clamp(32px, 4.5vw, 56px); line-height:1.05;
+  margin:0 0 14px; color:var(--ink);
+}
+h3.cap{
+  font-family:var(--sans); font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  font-size:11.5px; color:var(--csx-yellow-2); margin:0 0 14px;
+}
+h4{font-family:var(--sans); font-size:18px; font-weight:600; color:var(--ink); margin:0 0 6px; letter-spacing:-.005em}
+.lede{font-family:var(--serif); font-size:clamp(18px, 1.8vw, 22px); line-height:1.5; max-width:60ch; color:var(--ink-2); margin:0 0 24px}
+.body{font-size:16px; line-height:1.65; color:var(--ink-2); max-width:64ch; margin:0 0 16px}
+.body strong{color:var(--ink); font-weight:600}
+.body em{color:var(--csx-yellow-2); font-style:normal}
+
+.row{display:grid; gap:18px}
+.row.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.row.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.row.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.row.c2,.row.c3,.row.c4{grid-template-columns:1fr}}
+
+.card{
+  padding:22px 24px;
+  background:var(--paper); border:1px solid var(--line); border-radius:14px;
+  transition:border-color .2s ease, transform .2s ease;
+}
+.card:hover{border-color:var(--line-strong)}
+.card .cap{
+  font-family:var(--sans); font-size:10.5px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--csx-yellow); margin:0 0 10px;
+}
+.card h4{font-family:var(--serif); font-weight:600; font-size:22px; line-height:1.18; margin:0 0 8px; letter-spacing:-.01em}
+.card p{margin:0; font-size:15px; line-height:1.55; color:var(--ink-2)}
+.card.glow{border-color:rgba(242,169,0,.34); background:linear-gradient(180deg, rgba(242,169,0,.06), rgba(242,169,0,.01))}
+
+.stat{
+  text-align:left; padding:22px 26px;
+  background:linear-gradient(180deg, rgba(23,99,181,.10), rgba(23,99,181,.02));
+  border:1px solid rgba(23,99,181,.30); border-radius:14px;
+}
+.stat .num{
+  font-family:var(--serif); font-weight:600; letter-spacing:-.04em;
+  font-size:clamp(40px, 5vw, 64px); line-height:1; color:var(--ink);
+  background:linear-gradient(135deg,#fff 0%, #ffd56b 110%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.stat .lab{font-family:var(--sans); font-size:11.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin-top:6px}
+.stat .desc{margin-top:10px; font-size:14px; color:var(--ink-2); line-height:1.5}
+
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--sans); font-size:10.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  padding:5px 12px; border-radius:999px;
+  background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--ink-2);
+}
+.pill.live{background:rgba(45,212,191,.10); border-color:rgba(45,212,191,.35); color:var(--teal-2); padding-left:24px; position:relative}
+.pill.live::before{content:""; position:absolute; left:10px; top:50%; transform:translateY(-50%); width:7px; height:7px; border-radius:50%; background:var(--teal-2); box-shadow:0 0 0 3px rgba(45,212,191,.20)}
+.pill.brand{background:rgba(242,169,0,.10); border-color:rgba(242,169,0,.35); color:var(--csx-yellow-2)}
+.pill.future{background:rgba(23,99,181,.14); border-color:rgba(23,99,181,.4); color:#9bb9ee}
+
+.divider{height:1px; background:linear-gradient(90deg, transparent, var(--line-strong), transparent); margin:36px 0}
+
+.toc-strip{
+  position:sticky; top:8px; z-index:10;
+  display:flex; gap:6px; padding:8px 10px; margin:0 -8px 24px;
+  overflow-x:auto;
+  background:rgba(8,12,22,.74); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border:1px solid var(--line); border-radius:14px;
+  scrollbar-width:none;
+}
+.toc-strip::-webkit-scrollbar{display:none}
+.toc-strip a{
+  flex:none; font-family:var(--sans); font-size:11.5px; font-weight:600;
+  color:var(--ink-3); padding:8px 14px; border-radius:8px; text-decoration:none;
+  white-space:nowrap; transition:all .15s ease; letter-spacing:.04em;
+}
+.toc-strip a:hover{color:var(--ink); background:rgba(255,255,255,.05)}
+.toc-strip a.active{color:#0b3d91; background:var(--csx-yellow); font-weight:700}
+
+.hero-bg{
+  position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:
+    radial-gradient(540px 320px at 80% 10%, rgba(242,169,0,.30), transparent 60%),
+    radial-gradient(640px 380px at 5% 90%, rgba(23,99,181,.34), transparent 60%);
+}
+.hero-frame{display:grid; grid-template-columns:1.3fr 1fr; gap:48px; align-items:center}
+@media (max-width:980px){.hero-frame{grid-template-columns:1fr}}
+.hero-mark{display:flex; gap:14px; align-items:center; margin-bottom:6px}
+.hero-mark .glyph{
+  width:54px; height:54px; border-radius:14px;
+  background:var(--grad-brand);
+  box-shadow:0 16px 30px -10px rgba(11,61,145,.6), 0 0 0 1px rgba(255,255,255,.05) inset;
+  display:grid; place-items:center; position:relative;
+}
+.hero-mark .glyph::after{
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.18), transparent 50%);
+  border-radius:inherit;
+}
+.hero-mark .glyph svg{width:30px; height:30px; color:var(--csx-yellow)}
+.hero-mark .name{font-family:var(--sans); font-weight:700; font-size:19px; letter-spacing:-.01em; color:#fff}
+.hero-mark .name small{display:block; font-weight:600; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink-3); margin-top:1px}
+
+.hero-art{position:relative; min-height:380px}
+.hero-art .ring{position:absolute; border:1px dashed rgba(23,99,181,.30); border-radius:50%}
+.hero-art .ring.r1{width:340px; height:340px; right:-30px; top:20px}
+.hero-art .ring.r2{width:240px; height:240px; right:20px; top:70px; border-color:rgba(242,169,0,.35)}
+.hero-art .core{
+  position:absolute; right:80px; top:120px;
+  width:140px; height:140px; border-radius:50%;
+  background:var(--grad-brand);
+  box-shadow:0 30px 60px -15px rgba(11,61,145,.7), 0 0 0 1px rgba(255,255,255,.06) inset;
+  display:grid; place-items:center; color:var(--csx-yellow);
+  font-family:var(--serif); font-size:54px; font-weight:600;
+}
+.hero-art .planet{
+  position:absolute; width:48px; height:48px; border-radius:50%;
+  background:rgba(255,255,255,.08); border:1px solid var(--line-strong);
+  display:grid; place-items:center; font-family:var(--mono); font-size:10px; color:var(--ink-2);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+.hero-art .p1{right:-10px; top:60px}
+.hero-art .p2{right:170px; top:0}
+.hero-art .p3{right:240px; top:230px}
+.hero-art .p4{right:30px; top:300px}
+
+.flow{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; margin-top:28px}
+@media (max-width:900px){.flow{grid-template-columns:1fr 1fr}}
+.flow-step{padding:18px 18px 22px; background:var(--paper); border:1px solid var(--line); border-radius:12px; position:relative}
+.flow-step .nm{font-family:var(--mono); font-size:11px; color:var(--csx-yellow); font-weight:700; letter-spacing:.16em}
+.flow-step h4{margin-top:8px; font-family:var(--serif); font-size:18px; font-weight:600; line-height:1.18}
+.flow-step p{margin:8px 0 0; font-size:13.5px; color:var(--ink-2); line-height:1.55}
+
+.scenario{
+  display:grid; grid-template-columns:auto 1fr; gap:28px; align-items:start;
+  padding:28px; background:var(--paper); border:1px solid var(--line); border-radius:16px;
+}
+@media (max-width:780px){.scenario{grid-template-columns:1fr}}
+.scenario .who{
+  width:88px; height:88px; border-radius:18px;
+  background:var(--grad-brand);
+  display:grid; place-items:center; font-family:var(--serif); font-size:32px; font-weight:600; color:var(--csx-yellow);
+  box-shadow:0 16px 30px -10px rgba(11,61,145,.6);
+}
+.scenario .who.yellow{background:var(--grad-yellow); color:#1d2d52}
+.scenario .who.teal{background:linear-gradient(135deg,#34e8d2,#0e9b86); color:#0a3a32}
+.scenario h4{font-family:var(--serif); font-size:24px; font-weight:600; margin:0 0 6px}
+.scenario .role{font-family:var(--sans); font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--csx-yellow); font-weight:600; margin-bottom:14px}
+.scenario .seq{display:grid; gap:10px; font-size:14.5px; color:var(--ink-2); line-height:1.55}
+.scenario .seq .li{display:grid; grid-template-columns:24px 1fr; gap:8px}
+.scenario .seq .n{font-family:var(--mono); color:var(--csx-yellow); font-weight:700}
+.scenario .outcome{
+  margin-top:18px; padding:14px 18px;
+  background:rgba(45,212,191,.08); border-left:3px solid var(--teal-2); border-radius:8px;
+  font-size:14px; color:var(--ink); font-style:italic; font-family:var(--serif);
+}
+
+.chmap{
+  background:var(--paper); border:1px solid var(--line); border-radius:18px;
+  padding:32px 28px; margin-top:24px; position:relative; overflow:hidden;
+}
+.chmap svg{display:block; width:100%; height:auto}
+
+table{
+  width:100%; border-collapse:separate; border-spacing:0; margin:18px 0;
+  font-family:var(--sans); font-size:14.5px;
+  background:var(--paper); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+}
+th, td{padding:14px 16px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-family:var(--sans); font-size:10.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); background:rgba(255,255,255,.025)}
+td{color:var(--ink-2); line-height:1.55}
+td strong{color:var(--ink); font-weight:600}
+td.yes{color:var(--teal-2); font-weight:600}
+td.partial{color:var(--csx-yellow-2); font-weight:600}
+td.future{color:#9bb9ee; font-weight:600}
+tr:last-child td{border-bottom:0}
+
+.guards{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:22px}
+@media (max-width:880px){.guards{grid-template-columns:1fr}}
+.guard{padding:22px; background:var(--paper); border:1px solid var(--line); border-radius:14px; border-left:3px solid var(--csx-yellow)}
+.guard h4{font-family:var(--serif); font-size:20px; font-weight:600; margin:0 0 6px}
+.guard p{margin:0; font-size:14px; color:var(--ink-2); line-height:1.55}
+
+.roadmap{position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:24px}
+@media (max-width:880px){.roadmap{grid-template-columns:1fr}}
+.phase{padding:24px; background:var(--paper); border:1px solid var(--line); border-radius:14px; position:relative}
+.phase .ph{font-family:var(--mono); font-size:11.5px; color:var(--csx-yellow); font-weight:700; letter-spacing:.18em; margin-bottom:6px}
+.phase h4{font-family:var(--serif); font-size:24px; font-weight:600; margin:0 0 12px; line-height:1.18}
+.phase ul{margin:0; padding:0 0 0 1.1em; font-size:14px; color:var(--ink-2); line-height:1.6}
+.phase li{margin:.3em 0}
+.phase.now{border-color:rgba(45,212,191,.35); background:linear-gradient(180deg, rgba(45,212,191,.06), rgba(45,212,191,.01))}
+.phase.now .ph{color:var(--teal-2)}
+.phase.next{border-color:rgba(23,99,181,.35)}
+
+.cta{
+  margin-top:36px; padding:36px; text-align:center;
+  background:var(--grad-brand);
+  border-radius:18px; box-shadow:var(--sh-2); position:relative; overflow:hidden;
+}
+.cta::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(600px 300px at 80% -20%, rgba(242,169,0,.30), transparent 60%);
+}
+.cta h2{
+  font-family:var(--serif); font-size:clamp(32px,4vw,48px); font-weight:600; line-height:1.1;
+  color:#fff; margin:0 0 12px; letter-spacing:-.02em; position:relative;
+}
+.cta p{font-family:var(--serif); font-size:18px; color:rgba(255,255,255,.85); margin:0 0 20px; max-width:60ch; margin-inline:auto; position:relative}
+.cta .btn{
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--csx-yellow); color:#1d2d52;
+  padding:14px 28px; border-radius:999px;
+  font-family:var(--sans); font-weight:700; font-size:14px; letter-spacing:.05em; text-transform:uppercase;
+  text-decoration:none; transition:transform .2s ease; position:relative;
+}
+.cta .btn:hover{transform:translateY(-2px)}
+
+.foot{margin-top:40px; padding:24px; font-family:var(--sans); font-size:13px; color:var(--ink-3); border-top:1px solid var(--line); text-align:center}
+.foot strong{color:var(--ink-2); font-weight:600}
+
+.quote{
+  font-family:var(--serif); font-size:clamp(22px, 2.8vw, 32px); line-height:1.35; font-weight:500;
+  letter-spacing:-.015em; color:var(--ink); margin:18px 0;
+  padding:24px 28px;
+  border-left:4px solid var(--csx-yellow);
+  background:linear-gradient(90deg, rgba(242,169,0,.06), transparent);
+  border-radius:0 14px 14px 0;
+}
+.quote .who{display:block; margin-top:14px; font-family:var(--sans); font-size:13px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--csx-yellow); font-style:normal}
+
+.checks{list-style:none; padding:0; margin:14px 0; display:grid; gap:10px}
+.checks li{display:grid; grid-template-columns:24px 1fr; gap:10px; align-items:start; font-size:15.5px; color:var(--ink-2); line-height:1.55}
+.checks li::before{
+  content:"✓"; display:inline-grid; place-items:center;
+  width:22px; height:22px; border-radius:50%;
+  background:rgba(45,212,191,.15); color:var(--teal-2);
+  font-weight:700; font-size:12px; margin-top:2px;
+}
+.checks li strong{color:var(--ink); font-weight:600}
+
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 0}
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <nav class="toc-strip" id="toc">
+    <a href="#cover" class="active">01 · Cover</a>
+    <a href="#why">02 · Why now</a>
+    <a href="#proof">03 · The proof</a>
+    <a href="#vision">04 · The platform</a>
+    <a href="#scenarios">05 · Who uses it</a>
+    <a href="#channels">06 · Every channel</a>
+    <a href="#bulk">07 · Bulk &amp; complex</a>
+    <a href="#security">08 · Trust &amp; control</a>
+    <a href="#roadmap">09 · Roadmap</a>
+    <a href="#close">10 · The ask</a>
+  </nav>
+
+  <!-- ====================== 01 · COVER ====================== -->
+  <section class="slide" id="cover">
+    <div class="hero-bg"></div>
+    <div class="slidenum">01 / 10</div>
+
+    <div class="hero-mark">
+      <div class="glyph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg>
+      </div>
+      <div class="name">Lucid Relay<small>Leadership Briefing · 2026</small></div>
+    </div>
+
+    <div class="hero-frame">
+      <div>
+        <div class="kicker"><span class="dot"></span> A working POC, ready to grow up</div>
+        <h1 class="display">Plain English<br/>for the<br/>mainframe.</h1>
+        <p class="lede">
+          We turned the daily-vacation screen into a conversation. Now we want
+          to turn <em>every</em> leave-request screen — and the dozens like it
+          across CSX — into the same conversation. <strong>Same security. Same
+          audit. New surface area.</strong>
+        </p>
+        <div class="chips">
+          <span class="pill live">Live POC against MCVD</span>
+          <span class="pill brand">Web · Desktop · Voice</span>
+          <span class="pill brand">Email · Teams · API</span>
+          <span class="pill future">PL · Daily · Weekly Vacations · Roster</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="core">L</div>
+        <div class="planet p1">CHAT</div>
+        <div class="planet p2">VOICE</div>
+        <div class="planet p3">EMAIL</div>
+        <div class="planet p4">TEAMS</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="row c4" style="margin-top:8px">
+      <div class="stat">
+        <div class="num">1</div>
+        <div class="lab">Mainframe screen, today</div>
+        <div class="desc">MCVD daily vacation, live, end-to-end.</div>
+      </div>
+      <div class="stat">
+        <div class="num">7+</div>
+        <div class="lab">TECS leave + roster screens to absorb</div>
+        <div class="desc">PL · MCVD · MCVR · MCSV · MCRS · MCPL · MC22 …</div>
+      </div>
+      <div class="stat">
+        <div class="num">∞</div>
+        <div class="lab">Channels users can speak through</div>
+        <div class="desc">Web, desktop, Teams, email, voice, API.</div>
+      </div>
+      <div class="stat">
+        <div class="num">0</div>
+        <div class="lab">Mainframe changes required</div>
+        <div class="desc">We drive the existing screens — nothing to migrate.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 02 · WHY NOW ====================== -->
+  <section class="slide" id="why">
+    <div class="slidenum">02 / 10</div>
+    <h3 class="cap">The opportunity</h3>
+    <h2 class="display">CSX runs on green screens.<br/>People shouldn't have to.</h2>
+    <p class="body">
+      <strong>Engineers and conductors</strong> book leaves through TECS.
+      <strong>Local chairmen</strong> coordinate weekly vacation bids by seniority.
+      <strong>Crew callers and dispatchers</strong> live inside the MC02-family screens.
+      <strong>Managers</strong> approve, escalate, audit. Today every one of
+      them learns the screen shortcuts, the field positions, the auto-tab rules,
+      and the quirks of the host. <em>That's a tax we pay every shift.</em>
+    </p>
+
+    <div class="row c3" style="margin-top:18px">
+      <div class="card">
+        <div class="cap">Today</div>
+        <h4>One person, one screen, one keyboard</h4>
+        <p>Each request hand-typed into TECS. Errors creep in. Bulk asks become escalations. Audit lives in someone's head.</p>
+      </div>
+      <div class="card glow">
+        <div class="cap">With Lucid Relay</div>
+        <h4>One sentence. Anywhere. Audited.</h4>
+        <p>"Cancel my April 30 vacation." Spoken, typed, emailed, or said in Teams. The agent reads the live screen, plans, confirms, commits, and files the audit.</p>
+      </div>
+      <div class="card">
+        <div class="cap">Tomorrow</div>
+        <h4>Delegation, automation, intelligence</h4>
+        <p>Managers delegate. Bulk processes run unattended. Insights surface from data the host always had, but no-one could read at scale.</p>
+      </div>
+    </div>
+
+    <div class="quote">
+      We don't replace the mainframe. We replace the <em style="color:var(--csx-yellow-2);font-style:normal">distance</em> between
+      our people and the mainframe — with conversation, voice, audit, and guard rails.
+      <span class="who">— Lucid Relay product principle</span>
+    </div>
+  </section>
+
+  <!-- ====================== 03 · THE PROOF ====================== -->
+  <section class="slide" id="proof">
+    <div class="slidenum">03 / 10</div>
+    <h3 class="cap">What we already built</h3>
+    <h2 class="display">A working proof — verified live<br/>against the production MCVD screen.</h2>
+    <p class="body">
+      We picked the daily vacation flow because every part of leave management
+      shows up there: real RACF sign-on, real seniority rules, real Virtel
+      keystrokes, real audit. <strong>If it works there, it works for the rest.</strong>
+    </p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="nm">STEP 01</div>
+        <h4>Listen</h4>
+        <p>Speech, chat, email, Teams — all funnel into one understanding step.</p>
+      </div>
+      <div class="flow-step">
+        <div class="nm">STEP 02</div>
+        <h4>Verify</h4>
+        <p>Identity from Okta. Role from RACF. Sender from the channel itself.</p>
+      </div>
+      <div class="flow-step">
+        <div class="nm">STEP 03</div>
+        <h4>Plan</h4>
+        <p>The agent shows what it's about to do — in plain English — and waits.</p>
+      </div>
+      <div class="flow-step">
+        <div class="nm">STEP 04</div>
+        <h4>Confirm</h4>
+        <p>Nothing touches the host until the user (or their delegate) says <em>"yes, commit."</em></p>
+      </div>
+      <div class="flow-step">
+        <div class="nm">STEP 05</div>
+        <h4>Audit</h4>
+        <p>Every keystroke, every host response, every approver — captured, signed, queryable.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="row c2">
+      <div class="card">
+        <div class="cap">Live, today</div>
+        <h4>End-to-end MCVD daily vacation</h4>
+        <p>
+          Inquire balances. Book a single day. Cancel a single day. Multi-day
+          books. Cross-month navigation. Holiday and blackout pre-checks. Returns
+          the host's verbatim <code>UPDATE COMPLETED</code> in the chat.
+        </p>
+      </div>
+      <div class="card">
+        <div class="cap">Verified</div>
+        <h4>Real RACF, real CICSS021, real Virtel</h4>
+        <p>
+          Live sign-on with the user's RACF credentials. Real keystrokes through
+          Virtel's key handler — the only kind the host honours. Real DB2 commit.
+          Real screen scrape on return. No simulators.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 04 · THE PLATFORM ====================== -->
+  <section class="slide" id="vision">
+    <div class="slidenum">04 / 10</div>
+    <h3 class="cap">What it really is</h3>
+    <h2 class="display">Not an app.<br/>A <em style="font-style:normal; color:var(--csx-yellow-2)">platform</em> for agentic work.</h2>
+    <p class="body">
+      The POC is one screen, one channel, one workflow. But the <strong>shape</strong>
+      under it is general. We have an intent layer, a verifier, a planner, a
+      mainframe driver, and an audit log. Plug a new screen in once — reuse
+      everywhere. Plug a new channel in once — reuse everywhere.
+    </p>
+
+    <div class="chmap">
+      <svg viewBox="0 0 1100 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#f2a900"/>
+          </marker>
+        </defs>
+        <style>
+          .lbl{font-family:'Inter Tight',sans-serif; font-weight:600; fill:#f3f5fa}
+          .sub{font-family:'Inter Tight',sans-serif; fill:#8b93ad; font-size:11px}
+          .tag{font-family:'JetBrains Mono',monospace; fill:#f2a900; font-size:10.5px; font-weight:600; letter-spacing:.1em}
+          .ax{stroke:rgba(242,169,0,.55); stroke-width:1.5; fill:none; marker-end:url(#arr)}
+          .box{fill:rgba(255,255,255,.04); stroke:rgba(255,255,255,.16); stroke-width:1}
+          .box.brand{fill:rgba(23,99,181,.20); stroke:rgba(23,99,181,.5)}
+          .box.yellow{fill:rgba(242,169,0,.10); stroke:rgba(242,169,0,.4)}
+          .box.dark{fill:#040812; stroke:rgba(255,255,255,.12)}
+        </style>
+
+        <text x="60" y="32" class="tag">CHANNELS · WHERE PEOPLE ARE</text>
+        <rect class="box yellow" x="40" y="50" width="200" height="56" rx="12"/>
+        <text x="60" y="78" class="lbl" font-size="14">Conversational web</text>
+        <text x="60" y="94" class="sub">browser · embedded</text>
+
+        <rect class="box yellow" x="40" y="118" width="200" height="56" rx="12"/>
+        <text x="60" y="146" class="lbl" font-size="14">Desktop assistant</text>
+        <text x="60" y="162" class="sub">PySide6 · voice mode</text>
+
+        <rect class="box yellow" x="40" y="186" width="200" height="56" rx="12"/>
+        <text x="60" y="214" class="lbl" font-size="14">Microsoft Teams · Slack</text>
+        <text x="60" y="230" class="sub">@LucidRelay … reply</text>
+
+        <rect class="box yellow" x="40" y="254" width="200" height="56" rx="12"/>
+        <text x="60" y="282" class="lbl" font-size="14">Email gateway</text>
+        <text x="60" y="298" class="sub">lucid@csx.com · IMAP</text>
+
+        <rect class="box yellow" x="40" y="322" width="200" height="56" rx="12"/>
+        <text x="60" y="350" class="lbl" font-size="14">Voice / phone</text>
+        <text x="60" y="366" class="sub">"Hey Lucid…"</text>
+
+        <rect class="box yellow" x="40" y="390" width="200" height="56" rx="12"/>
+        <text x="60" y="418" class="lbl" font-size="14">REST API</text>
+        <text x="60" y="434" class="sub">automations · cron · BI</text>
+
+        <text x="370" y="32" class="tag">THE CORE</text>
+        <rect class="box brand" x="350" y="80" width="380" height="320" rx="18"/>
+        <rect x="370" y="100" width="340" height="56" rx="10" class="box"/>
+        <text x="386" y="128" class="lbl" font-size="14">Intent · plain English → structured</text>
+        <text x="386" y="144" class="sub">verbs · empids · dates · holidays · blackouts</text>
+
+        <rect x="370" y="168" width="340" height="56" rx="10" class="box"/>
+        <text x="386" y="196" class="lbl" font-size="14">Identity · authorisation</text>
+        <text x="386" y="212" class="sub">Okta · RACF · channel verification · scopes</text>
+
+        <rect x="370" y="236" width="340" height="56" rx="10" class="box"/>
+        <text x="386" y="264" class="lbl" font-size="14">Planner · confirmation · approval</text>
+        <text x="386" y="280" class="sub">"yes to commit" · delegation chains</text>
+
+        <rect x="370" y="304" width="340" height="74" rx="10" class="box"/>
+        <text x="386" y="332" class="lbl" font-size="14">Mainframe driver</text>
+        <text x="386" y="348" class="sub">Virtel keystrokes · multi-screen orchestration</text>
+        <text x="386" y="364" class="sub">CICSS021 · TECS · MCVD/PL/VR/SV/RS · DB2</text>
+        <text x="350" y="425" class="tag">EVERY EVENT → AUDIT LEDGER</text>
+
+        <text x="850" y="32" class="tag">SYSTEMS OF RECORD</text>
+        <rect class="box dark" x="830" y="50" width="220" height="86" rx="12"/>
+        <text x="850" y="80" class="lbl" font-size="14" fill="#9bf09a" font-family="JetBrains Mono">mframe.csx.com</text>
+        <text x="850" y="100" class="sub" fill="rgba(155,240,154,.7)">CICSS021 · TECS</text>
+        <text x="850" y="118" class="sub" fill="rgba(155,240,154,.7)">MCVD · MCPL · MCVR · MCSV</text>
+
+        <rect class="box dark" x="830" y="148" width="220" height="60" rx="12"/>
+        <text x="850" y="178" class="lbl" font-size="14" fill="#9bf09a" font-family="JetBrains Mono">DB2 · Beeson</text>
+        <text x="850" y="196" class="sub" fill="rgba(155,240,154,.7)">leaves · rosters · payroll</text>
+
+        <rect class="box dark" x="830" y="220" width="220" height="60" rx="12"/>
+        <text x="850" y="250" class="lbl" font-size="14" fill="#9bf09a" font-family="JetBrains Mono">EDW</text>
+        <text x="850" y="268" class="sub" fill="rgba(155,240,154,.7)">downstream feeds + reports</text>
+
+        <rect class="box dark" x="830" y="292" width="220" height="60" rx="12"/>
+        <text x="850" y="322" class="lbl" font-size="14" fill="#9bf09a" font-family="JetBrains Mono">CBT · Crew Web 1100</text>
+        <text x="850" y="340" class="sub" fill="rgba(155,240,154,.7)">balances · payroll master</text>
+
+        <path class="ax" d="M240 78 L 350 130"/>
+        <path class="ax" d="M240 146 L 350 168"/>
+        <path class="ax" d="M240 214 L 350 218"/>
+        <path class="ax" d="M240 282 L 350 244"/>
+        <path class="ax" d="M240 350 L 350 290"/>
+        <path class="ax" d="M240 418 L 350 340"/>
+
+        <path class="ax" d="M730 130 L 830 90"/>
+        <path class="ax" d="M730 200 L 830 178"/>
+        <path class="ax" d="M730 260 L 830 250"/>
+        <path class="ax" d="M730 340 L 830 322"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ====================== 05 · WHO USES IT ====================== -->
+  <section class="slide" id="scenarios">
+    <div class="slidenum">05 / 10</div>
+    <h3 class="cap">The scenarios</h3>
+    <h2 class="display">Same engine. Three very different days.</h2>
+
+    <div class="scenario">
+      <div class="who">EC</div>
+      <div>
+        <h4>The engineer</h4>
+        <div class="role">Day-to-day · mobile, hands full, in a yard or on the line</div>
+        <div class="seq">
+          <div class="li"><span class="n">1.</span> Opens Teams on a phone, types <em>"book April 30 daily vacation, my last comp day."</em></div>
+          <div class="li"><span class="n">2.</span> Lucid checks balance, holiday calendar, blackout — confirms intent in plain English.</div>
+          <div class="li"><span class="n">3.</span> Engineer replies <em>"yes."</em> Lucid signs into MCVD, types the <code>D</code>, captures the host response.</div>
+          <div class="li"><span class="n">4.</span> Confirmation lands back in the same Teams thread. Audit row written.</div>
+        </div>
+        <div class="outcome">No mainframe screen learning curve. No mistyped empid. Total wall-clock: 30 seconds.</div>
+      </div>
+    </div>
+
+    <div class="scenario" style="margin-top:18px">
+      <div class="who yellow">MN</div>
+      <div>
+        <h4>The manager</h4>
+        <div class="role">Delegating · approving on behalf of a team of forty</div>
+        <div class="seq">
+          <div class="li"><span class="n">1.</span> Asks Lucid in the desktop app: <em>"who on my crew has unused PL going into July?"</em></div>
+          <div class="li"><span class="n">2.</span> Lucid reads MCPL for every direct report, returns a sorted list with carry-over dates.</div>
+          <div class="li"><span class="n">3.</span> Manager picks three names, says <em>"draft a personal leave request for these on July 5 — wait for each person's approval."</em></div>
+          <div class="li"><span class="n">4.</span> Each engineer gets a notification on their channel. As they accept, Lucid commits each one.</div>
+        </div>
+        <div class="outcome">A coordination pattern that today takes hours of phone calls — done with one sentence and three taps.</div>
+      </div>
+    </div>
+
+    <div class="scenario" style="margin-top:18px">
+      <div class="who teal">DP</div>
+      <div>
+        <h4>The dispatcher / crew caller</h4>
+        <div class="role">High-volume · cross-screen · time-pressured</div>
+        <div class="seq">
+          <div class="li"><span class="n">1.</span> <em>"Lucid, mark off all conductors on roster 1402 for tomorrow's mark-up."</em></div>
+          <div class="li"><span class="n">2.</span> Lucid reads MCRS for the roster, drives MCSV for each entry, surfaces conflicts before committing.</div>
+          <div class="li"><span class="n">3.</span> One confirmation gate ("commit 23 of 23?"). Lucid runs the bulk operation, screen by screen, with retries.</div>
+          <div class="li"><span class="n">4.</span> Result: a CSV summary, a per-record audit trail, and a Teams card the local chairman can countersign.</div>
+        </div>
+        <div class="outcome">23 transactions, fully auditable, in a single voice command. No keypunch. No lost rows.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 06 · CHANNELS ====================== -->
+  <section class="slide" id="channels">
+    <div class="slidenum">06 / 10</div>
+    <h3 class="cap">Meet people where they already are</h3>
+    <h2 class="display">Every channel — one brain.</h2>
+    <p class="body">
+      Each person picks the channel that fits their day. The agent doesn't know
+      or care where the request came from — only that it was verified, planned,
+      confirmed, and committed against the live host. <strong>Add a channel
+      without changing the workflow. Add a workflow without changing the channels.</strong>
+    </p>
+
+    <div class="row c3" style="margin-top:18px">
+      <div class="card">
+        <div class="cap">For the desk</div>
+        <h4>Conversational web</h4>
+        <p>A clean chat surface in any browser. Hosted on our servers, reachable from any approved laptop.</p>
+        <div class="chips"><span class="pill live">Live in POC</span></div>
+      </div>
+      <div class="card">
+        <div class="cap">For the laptop</div>
+        <h4>Desktop assistant</h4>
+        <p>One installable app: chat panel, embedded mainframe view, push-to-talk voice mode, audit trail.</p>
+        <div class="chips"><span class="pill live">Live in POC</span></div>
+      </div>
+      <div class="card">
+        <div class="cap">For the field</div>
+        <h4>Microsoft Teams &amp; Slack</h4>
+        <p><em>@LucidRelay book April 30.</em> Verified by the workspace identity. Confirmation card lands inline.</p>
+        <div class="chips"><span class="pill live">Demo built</span></div>
+      </div>
+      <div class="card">
+        <div class="cap">For the office</div>
+        <h4>Email</h4>
+        <p>Send a sentence to <code>lucid@csx.com</code>. Get a verbatim host reply with an audit reference back.</p>
+        <div class="chips"><span class="pill live">Demo built</span></div>
+      </div>
+      <div class="card">
+        <div class="cap">For the cab</div>
+        <h4>Voice — "Hey Lucid…"</h4>
+        <p>Hands-free dictation, wake-word, on-device speech. Doesn't need internet for the recognition step.</p>
+        <div class="chips"><span class="pill live">Live in POC</span></div>
+      </div>
+      <div class="card">
+        <div class="cap">For the systems</div>
+        <h4>API &amp; automations</h4>
+        <p>Bulk imports, scheduled mark-ups, BI feeds. Same identity, same audit, no human in the loop.</p>
+        <div class="chips"><span class="pill future">Roadmap</span></div>
+      </div>
+    </div>
+
+    <div class="quote" style="margin-top:24px">
+      One brain in the middle. Every channel in front of it. Every screen behind it.
+    </div>
+  </section>
+
+  <!-- ====================== 07 · BULK & COMPLEX ====================== -->
+  <section class="slide" id="bulk">
+    <div class="slidenum">07 / 10</div>
+    <h3 class="cap">Beyond a single transaction</h3>
+    <h2 class="display">Bulk. Multi-screen. Coordinated.<br/>With guard rails on every step.</h2>
+    <p class="body">
+      A daily vacation request is the smallest unit. The same engine handles
+      hundreds of records across many screens — but never <em>silently</em>.
+      Every batch surfaces a plan, a confirmation, and a per-record outcome.
+      Failures don't get swept under a rug; they become a queue of follow-ups
+      for a human, with the rest already done.
+    </p>
+
+    <div class="row c2" style="margin-top:18px">
+      <div class="card glow">
+        <div class="cap">Pattern A · Bulk same-screen</div>
+        <h4>"Process this CSV against MCVD."</h4>
+        <p>
+          100 daily-vacation rows uploaded by Crew Ops. Lucid validates each
+          (employee exists, day is selectable, balance available), shows a plan
+          (<em>"96 will commit, 4 will fail with reasons"</em>), and on approval
+          runs the batch with retries. Each row gets its own audit entry.
+        </p>
+      </div>
+      <div class="card glow">
+        <div class="cap">Pattern B · Cross-screen workflow</div>
+        <h4>"Schedule weekly vacation by seniority for roster 1402."</h4>
+        <p>
+          Reads MCRS for seniority, checks MC22 for limits, walks MCVR for the
+          schedule, falls back to MCSV when entries don't fit, and writes
+          adjustments to MCPL where needed — all in one orchestrated session.
+        </p>
+      </div>
+      <div class="card">
+        <div class="cap">Pattern C · Approval chain</div>
+        <h4>"Manager-initiated PL on behalf of three engineers."</h4>
+        <p>
+          One manager intent fans out to three Teams notifications. Lucid waits
+          for each person's confirmation, commits per-employee, and reports a
+          consolidated outcome to the manager.
+        </p>
+      </div>
+      <div class="card">
+        <div class="cap">Pattern D · Read-and-summarise</div>
+        <h4>"What's the next 30 days look like for my crew?"</h4>
+        <p>
+          Read-only walk across MCVD/MCPL/MCRS for 40 employees, returned as a
+          natural-language brief with anomalies flagged. Zero mainframe writes,
+          full audit trail of <em>what was read.</em>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 08 · SECURITY ====================== -->
+  <section class="slide" id="security">
+    <div class="slidenum">08 / 10</div>
+    <h3 class="cap">Built for an audited, regulated environment</h3>
+    <h2 class="display">Security is a <em style="font-style:normal; color:var(--csx-yellow-2)">first-class</em> capability — not a feature.</h2>
+    <p class="body">
+      Lucid Relay does not weaken any control already in place. The mainframe
+      remains the system of record. Identity remains owned by Okta and RACF.
+      What we add is <strong>traceability</strong> — every conversation, every
+      decision, every keystroke logged and queryable.
+    </p>
+
+    <div class="guards">
+      <div class="guard">
+        <h4>Identity is end-to-end</h4>
+        <p>Channel verifies the user (Okta, Teams, signed email), agent verifies the role (RACF), screen verifies the empid. No anonymous writes.</p>
+      </div>
+      <div class="guard">
+        <h4>Confirmation is mandatory</h4>
+        <p>Nothing reaches the host until the user (or a delegated approver) explicitly confirms in plain language. Read-only requests don't need it.</p>
+      </div>
+      <div class="guard">
+        <h4>Plans are visible</h4>
+        <p>Every commit is preceded by a one-line plan in the same conversation. The user sees what will happen before it happens.</p>
+      </div>
+      <div class="guard">
+        <h4>The host's words are sacred</h4>
+        <p>We never paraphrase mainframe responses. Successes and errors come back verbatim — <code>UPDATE COMPLETED</code>, <code>NO UPDATES WERE REQUESTED</code> — alongside our friendly summary.</p>
+      </div>
+      <div class="guard">
+        <h4>Audit is automatic</h4>
+        <p>Every turn captures: who, channel, intent, plan, confirmation, host response, timestamp. Queryable per employee, per day, per screen.</p>
+      </div>
+      <div class="guard">
+        <h4>Secrets stay local</h4>
+        <p>RACF passwords and PINs are never sent to the language model. Voice transcription runs on-device. The host session is the user's session.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="row c2">
+      <div>
+        <h4 style="font-family:var(--serif); font-size:24px; margin:0 0 10px">Authorisation, in plain terms</h4>
+        <ul class="checks">
+          <li>You only see what your <strong>RACF role</strong> allows you to see.</li>
+          <li>You only commit what your <strong>RACF role</strong> allows you to commit.</li>
+          <li>Managers <strong>delegate</strong> — they don't impersonate.</li>
+          <li>Bulk operations require an <strong>elevated scope</strong>, signed off explicitly.</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="font-family:var(--serif); font-size:24px; margin:0 0 10px">"Can I see what I've done?"</h4>
+        <ul class="checks">
+          <li>Yes — every user has a <strong>personal board</strong> of today's actions across all channels.</li>
+          <li>Filter by date, by screen, by channel, by outcome.</li>
+          <li>Export an <strong>audit pack</strong> for any time window.</li>
+          <li>Replay any conversation, including the host's verbatim responses.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 09 · ROADMAP ====================== -->
+  <section class="slide" id="roadmap">
+    <div class="slidenum">09 / 10</div>
+    <h3 class="cap">From proof to platform</h3>
+    <h2 class="display">A staged path. Each step a complete demo.</h2>
+
+    <div class="roadmap">
+      <div class="phase now">
+        <div class="ph">PHASE · NOW</div>
+        <h4>Proof against MCVD</h4>
+        <ul>
+          <li>Live daily-vacation book + cancel</li>
+          <li>Web, desktop, voice, Teams &amp; email scaffolds</li>
+          <li>Audit log capture per turn</li>
+          <li>Real RACF, real Virtel, real DB2</li>
+        </ul>
+      </div>
+      <div class="phase next">
+        <div class="ph">PHASE · NEXT (one quarter)</div>
+        <h4>All TECS leave screens</h4>
+        <ul>
+          <li>Personal leaves (MCPL, MC22)</li>
+          <li>Weekly vacations &amp; bidding</li>
+          <li>Roster reads (MCRS, MCVR)</li>
+          <li>Per-user dashboard / audit board</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="ph">PHASE · AFTER</div>
+        <h4>Cross-platform agentic ops</h4>
+        <ul>
+          <li>Manager delegation &amp; approval chains</li>
+          <li>Bulk batch operator (CSV in, audit out)</li>
+          <li>Crew, train ordering, CAF read flows</li>
+          <li>Productionised on-prem hub for many users</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h4 style="font-family:var(--serif); font-size:24px; margin:0 0 12px">What we keep — at every phase</h4>
+    <table>
+      <thead><tr><th>Capability</th><th>Phase: Now</th><th>Phase: Next</th><th>Phase: After</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Confirmation before commit</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td><strong>Identity through Okta + RACF</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td><strong>Verbatim host responses</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td><strong>Per-turn audit log</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td><strong>Personal action board</strong></td><td class="partial">scaffold</td><td class="yes">first-class</td><td class="yes">team rollups</td></tr>
+        <tr><td><strong>Multi-screen orchestration</strong></td><td class="partial">single-screen</td><td class="yes">read across screens</td><td class="yes">write across screens</td></tr>
+        <tr><td><strong>Bulk batch operator</strong></td><td class="future">—</td><td class="future">—</td><td class="yes">CSV → audit pack</td></tr>
+        <tr><td><strong>Manager delegation</strong></td><td class="future">—</td><td class="partial">request-to-approve</td><td class="yes">full chains</td></tr>
+        <tr><td><strong>Voice mode</strong></td><td class="yes">push-to-talk + wake</td><td class="yes">+ multi-turn</td><td class="yes">+ phone IVR</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ====================== 10 · CLOSE / ASK ====================== -->
+  <section class="slide" id="close">
+    <div class="slidenum">10 / 10</div>
+    <h3 class="cap">The ask</h3>
+    <h2 class="display">Let us turn the proof into a platform.</h2>
+
+    <p class="body">
+      We have a working agent against the most-used leave screen in TECS. The
+      shape under it is general. With your sponsorship we will:
+    </p>
+
+    <ul class="checks">
+      <li><strong>Absorb the rest of the leave-request family</strong> — personal leaves, weekly vacation, roster reads — using the exact same engine.</li>
+      <li><strong>Stand up the channels in production</strong> — Teams, email, voice — so people speak to TECS the way they speak to each other.</li>
+      <li><strong>Ship the personal action board</strong> — every user sees, in one place, every action they took, every approval, every outcome.</li>
+      <li><strong>Open the bulk operator</strong> — a single safe, audited entry point for the kinds of mass updates that today live in spreadsheets and email chains.</li>
+      <li><strong>Prove the pattern is portable</strong> — same engine, second TECS family next quarter; third the quarter after.</li>
+    </ul>
+
+    <div class="cta">
+      <h2>Same mainframe. New surface area.<br/>Plain English. Full audit.</h2>
+      <p>Lucid Relay turns 30 years of green-screen muscle memory into a sentence — without retraining the host, without rewriting the controls, and without losing a single audit row.</p>
+      <a href="#cover" class="btn">Back to the top ↑</a>
+    </div>
+
+    <p class="foot">
+      <strong>Lucid Relay</strong> · Leadership briefing · 2026<br/>
+      Companion docs in the repo: <code>LucidRelay.html</code> · <code>DeploymentArchitecture.html</code> · <code>Samples.html</code>
+    </p>
+  </section>
+
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const links = Array.from(document.querySelectorAll('#toc a'));
+  function onScroll(){
+    const probe = window.innerHeight * 0.32;
+    let active = slides[0];
+    for (const s of slides){
+      const r = s.getBoundingClientRect();
+      if (r.top - probe <= 0) active = s;
+    }
+    if (active){
+      const id = active.id;
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+    }
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+</script>
+
+</body>
+</html>
