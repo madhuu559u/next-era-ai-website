@@ -1,0 +1,142 @@
+
+Kandlakunta, Kalyan started transcription
+
+Kandlakunta, Kalyan
+0 minutes 3 seconds0:03
+Kandlakunta, Kalyan 0 minutes 3 seconds
+Daniel, this is more of a just to set the expectation, right? We have all the productivity items. One way to do it is go and enhance all those COPAL programs and spend all that money and time. The other way is can an agent do it?
+Kandlakunta, Kalyan 0 minutes 22 seconds
+Based on a request from a in a field, I want to be off next two days, whatever, and then we go through a bunch of tech screens to perform some updates. Can that be done by today's being done by a person? Can we do it through through this agent and which sends a message back where crew callers are not tied up again?
+
+Jackson, Danielle
+0 minutes 25 seconds0:25
+Jackson, Danielle 0 minutes 25 seconds
+Okay.
+Jackson, Danielle 0 minutes 32 seconds
+Okay.
+Jackson, Danielle 0 minutes 42 seconds
+And.
+
+Kandlakunta, Kalyan
+0 minutes 42 seconds0:42
+Kandlakunta, Kalyan 0 minutes 42 seconds
+Out of 37 initiatives we have, there are some simple like this. So once we feel comfortable with this approach, we could probably pick a couple of items. And then what it does is it helps to quickly productionize and save time and money, and Jeff can get the benefit today.
+Kandlakunta, Kalyan 1 minute 1 second
+Now, there may be some gotchas because this is the first time we're trying to use this. Just to set the expectation for the team, reliability is the most important thing. If we push this, it should work all the time. Or when it fails, it should have a good routing mechanism in place for somebody to manually work on it.
+
+Jackson, Danielle
+1 minute 1 second1:01
+Jackson, Danielle 1 minute 1 second
+OK.
+
+Kandlakunta, Kalyan
+1 minute 20 seconds1:20
+Kandlakunta, Kalyan 1 minute 20 seconds
+But it should work all the time. So that's I want to make sure all of us are on the same way on that. That being said, go ahead, Gopal. I'll turn it over to you.
+SV
+
+Sura Varshit
+1 minute 24 seconds1:24
+Sura Varshit 1 minute 24 seconds
+Yes.
+SV
+Suneetha Vegasana
+1 minute 31 seconds1:31
+Suneetha Vegasana 1 minute 31 seconds
+So, so Kalyan, I will, yeah, I'll take it over from here, Kalyan, and to the extent that we understood Kalyan last time, you know, when we were there, we created a a self-service application for the employees to apply for the leave, and then take that leave, you know, the manager will come in.
+
+Pappu, Gopal (RAIL INFOTECH LLC)
+1 minute 31 seconds1:31
+Pappu, Gopal (RAIL INFOTECH LLC) 1 minute 31 seconds
+Sanjeev, you want to take it over? Yeah.
+SV
+Suneetha Vegasana
+1 minute 49 seconds1:49
+Suneetha Vegasana 1 minute 49 seconds
+You know, approve it on a on a screen, and then from it will the agent will go and you know, execute. So, basically, it's an automation script that it'll execute. It'll call the crew Hr. I think that's what you use for the mainframe, and it'll go through those screens and processes it, so, and we can also put an agent, but you know...
+Suneetha Vegasana 2 minutes 9 seconds
+simple, you know, kind of a screen script type of an application. So we'll demo that first, Kalyan. And then the second use case also, which we discussed, which was to have a small SLM running on tablets for the field workers to be able to refer to the safety guides.
+
+Kandlakunta, Kalyan
+2 minutes 11 seconds2:11
+Kandlakunta, Kalyan 2 minutes 11 seconds
+****.
+SV
+Suneetha Vegasana
+2 minutes 29 seconds2:29
+Suneetha Vegasana 2 minutes 29 seconds
+So, they can, you know, quickly query and ask any questions and get the information along with the source of information, so that also second use case that we have, you know, ready for the demo. So, these two use cases will, you know, demo Kandlakunta, and we will definitely be able to, you know, you know, this was very...
+Suneetha Vegasana 2 minutes 49 seconds
+First level of demo, and you know, to the extent that we discussed, but we know we will, once you're okay with this, or at least somewhat okay with it, we can go gather more details and then actually exactly build it to your, you know, requirement. So, without further ado, I know we only have 20 minutes left in the call, Kalyan.
+
+Kandlakunta, Kalyan
+3 minutes 7 seconds3:07
+Kandlakunta, Kalyan 3 minutes 7 seconds
+Right, yeah.
+SV
+Suneetha Vegasana
+3 minutes 8 seconds3:08
+Suneetha Vegasana 3 minutes 8 seconds
+I will have a Varshit if we can quickly demo both the apps. First, let's do the self-service app for the Hr leave application, and then we'll go to the small SLM demo.
+SV
+Sura Varshit
+3 minutes 22 seconds3:22
+Sura Varshit 3 minutes 22 seconds
+Sure, sir. Hi, hi everyone.
+
+Kandlakunta, Kalyan
+3 minutes 23 seconds3:23
+Kandlakunta, Kalyan 3 minutes 23 seconds
+Thank you.
+UM
+UPPALAPATI, MADHU (RAIL INFOTECH LLC)
+42 minutes 58 seconds42:58
+UPPALAPATI, MADHU (RAIL INFOTECH LLC) 42 minutes 58 seconds
+Sure.
+
+Jackson, Danielle
+43 minutes 3 seconds43:03
+Jackson, Danielle 43 minutes 3 seconds
+Nope, I'm good.
+
+Kandlakunta, Kalyan
+43 minutes 4 seconds43:04
+Kandlakunta, Kalyan 43 minutes 4 seconds
+Awesome. All right. Thank you all. Appreciate it. Thanks for your time and good, good work. Yeah, it's only going to get better.
+UM
+UPPALAPATI, MADHU (RAIL INFOTECH LLC)
+43 minutes 5 seconds43:05
+UPPALAPATI, MADHU (RAIL INFOTECH LLC) 43 minutes 5 seconds
+Hey, thanks, Daniel. Thanks, Satish. Thanks, Kalyan.
+
+Nannapaneni, Srini (RAIL INFOTECH LLC)
+43 minutes 7 seconds43:07
+Nannapaneni, Srini (RAIL INFOTECH LLC) 43 minutes 7 seconds
+Thank you, Daniel. Yeah.
+
+Maddukuri, Narendra Kumar (RAIL INFOTECH LLC)
+43 minutes 9 seconds43:09
+Maddukuri, Narendra Kumar (RAIL INFOTECH LLC) 43 minutes 9 seconds
+Lynch.
+UM
+UPPALAPATI, MADHU (RAIL INFOTECH LLC)
+43 minutes 10 seconds43:10
+UPPALAPATI, MADHU (RAIL INFOTECH LLC) 43 minutes 10 seconds
+Thank you. Thank you.
+
+Maddukuri, Narendra Kumar (RAIL INFOTECH LLC)
+43 minutes 12 seconds43:12
+Maddukuri, Narendra Kumar (RAIL INFOTECH LLC) 43 minutes 12 seconds
+Thank you.
+
+Nannapaneni, Srini (RAIL INFOTECH LLC)
+43 minutes 12 seconds43:12
+Nannapaneni, Srini (RAIL INFOTECH LLC) 43 minutes 12 seconds
+Yeah, sure. Thank you. Thank you, everyone. Bye.
+
+Kandlakunta, Kalyan
+43 minutes 12 seconds43:12
+Kandlakunta, Kalyan 43 minutes 12 seconds
+Right, yeah.
+
+Kandlakunta, Kalyan stopped transcription
